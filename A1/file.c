@@ -1,5 +1,9 @@
 #include <stdio.h>  // fprintf, stdout
 #include <stdlib.h> // EXIT_FAILURE, EXIT_SUCCESS.
+#define UTF8_2B(x) (x > 1) ? UTF8_2B(x/2) :  
+#define UTF8_3B
+#define UTF8_4B
+#define UTF8_CONT
 
 int print_hello_world() {
   return fprintf(stdout, "Hello, world!\n");
