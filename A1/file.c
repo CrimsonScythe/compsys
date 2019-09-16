@@ -6,31 +6,33 @@
 #include <string.h>
 
 
-int print_error(char* fileName, int errnum) {
-  return fprintf(stdout, "%s: cannot determine (%s)\n",
-    fileName, strerror(errnum)); 
+int print_error(const char *path, int max_length, int errnum) {
+  return fprintf(stdout, "%s:%*scannot determine (%s)\n",
+    path, (int) (max_length - strlen(path)), " ", strerror(errnum)); 
 }
 
 int main(int argc, char *argv[]) {
-  int retval = EXIT_SUCCESS;
-  struct stat buffer;
+  
+  // int retval = EXIT_SUCCESS;
   int cha;
+
   if (argc < 2) {
-    retval = EXIT_FAILURE;
-  }
-  if (argv[1] == NULL) {
     printf("usage: file path \n");
-    retval = EXIT_SUCCESS;
-  }
-  for (int i = 1; argv[i] != '\0'; i++) {
+    return EXIT_FAILURE;
+  }  
+  
+  for (int i = 1; i < argc; i++)
+  {
+    if (fopen(argv[i],"r") == NULL)
+    {
+      print_error(argv[i], 5 ,errno);
+      // return EXIT_SUCCESS;
+      continue;
+    }
+
     char* fileName = argv[i];
     FILE *file = fopen(fileName,"r");
-    int notExist = stat(fileName,&buffer);
-    if (notExist && fileName != NULL && file == NULL) {
-      print_error(fileName, 2);
-      retval = EXIT_SUCCESS;
-    } 
-    if (fileName != NULL && !notExist) {
+    
       int count = {0};
       int num;
       int status;
@@ -40,7 +42,7 @@ int main(int argc, char *argv[]) {
         ++count;
         num = cha;
 
-        if ((num >= 7 && num <= 13) || (num == 27) || (num >= 32 && num <= 126)) {
+        if (num > -1 && num < 128) {
           status = 0;
         }
 
@@ -69,7 +71,9 @@ int main(int argc, char *argv[]) {
         printf("%s", fileName);
         printf(": ISO-8859 text\n");
       }
-    }
+    
+  
   }
-  return retval;
+  
+  return EXIT_SUCCESS;
 }
