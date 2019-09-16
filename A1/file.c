@@ -56,20 +56,20 @@ int main(int argc, char *argv[]) {
         }  
       }  
       if (count == 0) {
-        printf("%s", fileName);
-        printf(": empty\n");
+        fprintf(stdout, "%s:%*s%s\n",
+        fileName, (int) (5 - strlen(fileName)), " ", "empty");
       }
       if (status == 0 && count > 0) {
-        printf("%s", fileName);
-        printf(": ASCII text\n");
+        fprintf(stdout, "%s:%*s%s\n",
+        fileName, (int) (5 - strlen(fileName)), " ", "ASCII text");
       }
       if (status == 1 && count > 0) {
-        printf("%s", fileName);
-        printf(": data\n");
+        fprintf(stdout, "%s:%*s%s\n",
+        fileName, (int) (5 - strlen(fileName)), " ", "data");
       }
       if (status == 2 && count > 0) {
-        printf("%s", fileName);
-        printf(": ISO-8859 text\n");
+        fprintf(stdout, "%s:%*s%s\n",
+        fileName, (int) (5 - strlen(fileName)), " ", "ISO-8859 text");
       }
     
   
