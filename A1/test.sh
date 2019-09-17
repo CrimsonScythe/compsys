@@ -14,8 +14,13 @@ rm -f test_files/*
 echo "Generating test files.."
 printf "Hello, World!\n" > test_files/ascii.input
 printf "Hello, World!" > test_files/ascii2.input
+printf "Det er i dag et hvert et solskin vejr!" > test_files/ascii3.input
 printf "Hello,\x00World!\n" > test_files/data.input
 printf "" > test_files/empty.input
+printf "ÆØÅ\n" > test_files/iso.input
+iconv -t ISO_8859-15 test_files/iso.input > test_files/iso.input 
+
+
 ### TODO: Generate more test files ###
 
 
