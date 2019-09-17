@@ -20,7 +20,16 @@ int main(int argc, char *argv[]) {
     printf("usage: file path \n");
     return EXIT_FAILURE;
   }  
-  
+  int max_length = 0;
+  for (int j = 1; j < argc; j++)
+      {
+        if ((int) strlen(argv[j]) > max_length)
+        {
+          max_length = (int)strlen(argv[j] );
+        }
+      }
+  max_length = max_length +1;
+
   for (int i = 1; i < argc; i++)
   {
     if (fopen(argv[i],"r") == NULL)
@@ -29,7 +38,6 @@ int main(int argc, char *argv[]) {
       // return EXIT_SUCCESS;
       continue;
     }
-
     char* fileName = argv[i];
     FILE *file = fopen(fileName,"r");
     
@@ -41,6 +49,8 @@ int main(int argc, char *argv[]) {
         if (cha == EOF) {break;}
         ++count;
         num = cha;
+        /* printf("%i\n", num);
+        printf("%02x\n", cha); */
 
         if ((num >= 7 && num <= 13) || (num == 27) || (num >= 32 && num <= 126)) {
           status = 0;
@@ -54,22 +64,23 @@ int main(int argc, char *argv[]) {
           status = 1;
           break; 
         }
-      }  
+      }
+      
       if (count == 0) {
         fprintf(stdout, "%s:%*s%s\n",
-        fileName, (int) (5 - strlen(fileName)), " ", "empty");
+        fileName, (int) (max_length - strlen(fileName)), " ", "empty");
       }
       if (status == 0 && count > 0) {
         fprintf(stdout, "%s:%*s%s\n",
-        fileName, (int) (5 - strlen(fileName)), " ", "ASCII text");
+        fileName, (int) (max_length - strlen(fileName)), " ", "ASCII text");
       }
       if (status == 1 && count > 0) {
         fprintf(stdout, "%s:%*s%s\n",
-        fileName, (int) (5 - strlen(fileName)), " ", "data");
+        fileName, (int) (max_length - strlen(fileName)), " ", "data");
       }
       if (status == 2 && count > 0) {
         fprintf(stdout, "%s:%*s%s\n",
-        fileName, (int) (5 - strlen(fileName)), " ", "ISO-8859 text");
+        fileName, (int) (max_length - strlen(fileName)), " ", "UTF-8 Unicode text");
       }
     
   
