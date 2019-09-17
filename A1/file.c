@@ -49,8 +49,29 @@ int main(int argc, char *argv[]) {
         if (cha == EOF) {break;}
         ++count;
         num = cha;
-        /* printf("%i\n", num);
-        printf("%02x\n", cha); */
+        // printf("%x\n", num);
+
+        if (num == 255)
+        {
+          if (fgetc(file) == 254)
+          {
+            status = 4;
+            break;
+          }
+          
+        }
+
+        if (num == 254)
+        {
+          if (fgetc(file) == 255)
+          {
+            status = 5;
+            break;
+          }
+          
+        }
+        
+        
 
         if ((num >= 7 && num <= 13) || (num == 27) || (num >= 32 && num <= 126)) {
           status = 0;
@@ -59,7 +80,12 @@ int main(int argc, char *argv[]) {
         else if ((num >= 160 && num <= 255)) {
             status = 2;
             break;
-        }
+        } 
+        else if (num >= 256 && num <= 1114111){
+          status = 3;
+          break;
+        } 
+      
         else {
           status = 1;
           break; 
@@ -80,9 +106,20 @@ int main(int argc, char *argv[]) {
       }
       if (status == 2 && count > 0) {
         fprintf(stdout, "%s:%*s%s\n",
+        fileName, (int) (max_length - strlen(fileName)), " ", "ISO-8859 text");
+      }
+      if (status == 3 && count > 0) {
+        fprintf(stdout, "%s:%*s%s\n",
         fileName, (int) (max_length - strlen(fileName)), " ", "UTF-8 Unicode text");
       }
-    
+      if (status == 4 && count > 0) {
+        fprintf(stdout, "%s:%*s%s\n",
+        fileName, (int) (max_length - strlen(fileName)), " ", "Little-endian UTF-16 Unicode text");
+      }
+      if (status == 5 && count > 0) {
+        fprintf(stdout, "%s:%*s%s\n",
+        fileName, (int) (max_length - strlen(fileName)), " ", "Big-endian UTF-16 Unicode text");
+      }
   
   }
   

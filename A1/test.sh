@@ -19,7 +19,10 @@ printf "Hello,\x00World!\n" > test_files/data.input
 printf "" > test_files/empty.input
 printf "ÆØÅ\n" > test_files/iso.input
 iconv -t ISO_8859-15 test_files/iso.input > test_files/iso.input 
-
+printf "hhh" > test_files/leutf16.input
+iconv -t UTF-16LE test_files/leutf16.input > test_files/leutf16.input 
+printf "hhh" > test_files/beutf16.input
+iconv -t UTF-16BE test_files/beutf16.input > test_files/beutf16.input 
 
 ### TODO: Generate more test files ###
 
