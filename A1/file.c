@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
         ++count;
         num = cha;
 
-        if (num > -1 && num < 128) {
+        if ((num >= 7 && num <= 13) || (num == 27) || (num >= 32 && num <= 126)) {
           status = 0;
         }
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
         else {
           status = 1;
           break; 
-        }  
+        }
       }  
       if (count == 0) {
         fprintf(stdout, "%s:%*s%s\n",
