@@ -23,6 +23,11 @@ printf "hhh" > test_files/leutf16.input
 iconv -t UTF-16LE test_files/leutf16.input > test_files/leutf16.input 
 printf "hhh" > test_files/beutf16.input
 iconv -t UTF-16BE test_files/beutf16.input > test_files/beutf16.input 
+printf "xE6"> test_files/isoo.input
+
+
+
+
 
 ### TODO: Generate more test files ###
 

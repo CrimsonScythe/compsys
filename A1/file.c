@@ -4,6 +4,10 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <string.h>
+#define UTF8_2B(ARG) (((ARG) > 191) && ((ARG) < 224)) 
+#define UTF8_3B(ARG) ((ARG) >= 224 && (ARG) <= 239)
+#define UTF8_4B(ARG) (((ARG) >= 240) && ((ARG) <= 247))
+#define UTF8_CONT(ARG) (((ARG) >= 128) && ((ARG) <= 191))
 
 
 int print_error(const char *path, int max_length, int errnum) {
@@ -12,6 +16,7 @@ int print_error(const char *path, int max_length, int errnum) {
 }
 
 int main(int argc, char *argv[]) {
+  
   
   // int retval = EXIT_SUCCESS;
   int cha;
