@@ -31,8 +31,6 @@ printf "\xe6\xf8\xe5\n" > test_files/ISO3.input
 
 # Testing for empty file 
 printf "" > test_files/empty.input 
-printf "\x0048 \xe3\n" > test_files/empty2.input 
-
 
 
 
