@@ -35,17 +35,13 @@ int main(int argc, char *argv[]) {
       }
   max_length = max_length +1;
 
-  for (int i = 1; i < argc; i++)
-  {
-    if (fopen(argv[i],"r") == NULL)
-    {
+  for (int i = 1; i < argc; i++) {
+    if (fopen(argv[i],"r") == NULL) {
       print_error(argv[i], 5 ,errno);
-      // return EXIT_SUCCESS;
       continue;
     }
     char* fileName = argv[i];
-    FILE *file = fopen(fileName,"r");
-    
+    FILE *file = fopen(fileName,"r");   
       int count = {0};
       int num;
       int status;
@@ -75,9 +71,6 @@ int main(int argc, char *argv[]) {
           }
           
         }
-        
-        
-
         if ((num >= 7 && num <= 13) || (num == 27) || (num >= 32 && num <= 126)) {
           status = 0;
         }
@@ -124,9 +117,7 @@ int main(int argc, char *argv[]) {
       if (status == 5 && count > 0) {
         fprintf(stdout, "%s:%*s%s\n",
         fileName, (int) (max_length - strlen(fileName)), " ", "Big-endian UTF-16 Unicode text");
-      }
-  
-  }
-  
+      }  
+  }  
   return EXIT_SUCCESS;
 }
