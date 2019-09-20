@@ -16,11 +16,7 @@ int print_error(const char *path, int max_length, int errnum) {
 }
 
 int main(int argc, char *argv[]) {
-  
-  
-  // int retval = EXIT_SUCCESS;
   int cha;
-
   if (argc < 2) {
     printf("usage: file path \n");
     return EXIT_FAILURE;
@@ -37,7 +33,7 @@ int main(int argc, char *argv[]) {
 
   for (int i = 1; i < argc; i++) {
     if (fopen(argv[i],"r") == NULL) {
-      print_error(argv[i], 5 ,errno);
+      print_error(argv[i], max_length ,errno);
       continue;
     }
     char* fileName = argv[i];
@@ -50,31 +46,21 @@ int main(int argc, char *argv[]) {
         if (cha == EOF) {break;}
         ++count;
         num = cha;
-        // printf("%x\n", num);
-
-        if (num == 255)
-        {
-          if (fgetc(file) == 254)
-          {
+        if (num == 255) {
+          if (fgetc(file) == 254) {
             status = 4;
             break;
-          }
-          
+          }          
         }
-
-        if (num == 254)
-        {
-          if (fgetc(file) == 255)
-          {
+        if (num == 254) {
+          if (fgetc(file) == 255) {
             status = 5;
             break;
-          }
-          
+          }          
         }
         if ((num >= 7 && num <= 13) || (num == 27) || (num >= 32 && num <= 126)) {
           status = 0;
         }
-
         else if ((num >= 160 && num <= 255)) {
             status = 2;
             break;
