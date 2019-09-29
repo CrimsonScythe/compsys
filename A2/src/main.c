@@ -25,9 +25,15 @@
 #define LEAQ7          0xB
 #define IMM_CBRANCH    0xF        
 
-//minor opcode
+//minor opcodes
+//reg move to memory major op code: 0x3
 #define REG_MOVQ_MT    0x9 
+//reg move from memory major op code:0x3
 #define REG_MOVQ_MF    0x1
+//reg move from i(register) major op code: 0x7
+#define REG_IMM_MULTF  0x5
+//reg move to i(register) major op code: 0x7
+#define REG_IMM_MULTT  0xD
 
 #define JMP 0xF
 #define CALL 0xE
@@ -102,17 +108,21 @@ int main(int argc, char* argv[]) {
         bool is_imm_movq = is(IMM_MOVQ, major_op);
         bool is_imm_arith = is(IMM_ARITHMETIC, major_op);
         bool is_reg_movq_mem = is(REG_MOVQ_MEM, major_op);
-
+        bool is_imm_movq_mem = is(IMM_MOVQ_MEM, major_op);
         //decode instruction type
         // read minor operation code
         bool is_imm_arith_sub = is(SUB, minor_op);
         bool is_imm_arith_add = is(ADD, minor_op);
-        bool is_reg_movq_memT = is(REG_MOVQ_MT, minor_op);
-        bool is_reg_movq_memF = is(REG_MOVQ_MF, minor_op);
+        // only check for memT and memF if major op code is mem
+        bool is_reg_movq_memT = is_reg_movq_mem && is(REG_MOVQ_MT, minor_op);
+        bool is_reg_movq_memF = is_reg_movq_mem && is(REG_MOVQ_MF, minor_op);
+        // only check for memT and memF if major op code is imm_movq_mem
+        bool is_imm_movq_memT = is_imm_movq_mem && is(REG_IMM_MULTT, minor_op);
+        bool is_imm_movq_memF = is_imm_movq_mem && is(REG_IMM_MULTF, minor_op);
 
         // determine instruction size
         bool size2 = is_return || is_reg_movq || is_reg_movq_mem;
-        bool size6 = is_imm_movq || is_imm_arith;   
+        bool size6 = is_imm_movq || is_imm_arith || is_imm_movq_mem;   
 
 
 
@@ -123,7 +133,7 @@ int main(int argc, char* argv[]) {
         val reg_read_dz = reg_d;
         // - other read port is always reg_s
         // - write is always to reg_d
-        bool reg_wr_enable = is_reg_movq || is_imm_movq || is_imm_arith || is_reg_movq_memF;
+        bool reg_wr_enable = is_reg_movq || is_imm_movq || is_imm_arith || is_reg_movq_memF || is_imm_movq_memF;
 
         // Datapath:
         //
@@ -148,9 +158,21 @@ int main(int argc, char* argv[]) {
 
         // not really any calculations yet!
         // generate address for memory access
+
+        //bool for checking whether immediate should be used in LEAQ calculation
+
+        
+        // val agen_result = address_generate(reg_out_a, reg_out_b,
+        //  sext_imm_i, from_int(0),
+        // false,
+        // true,
+        // is_imm_movq_memF || is_imm_movq_memT);   
+        
         val agen_result = address_generate(reg_out_a, reg_out_b,
          sext_imm_i, from_int(0),
-        false, true, false);   
+        false,
+        is_imm_movq_mem || is_reg_movq_mem,
+        is_imm_movq_memF || is_imm_movq_memT);   
         // ....
 
         // address of succeeding instruction in memory
@@ -164,7 +186,7 @@ int main(int argc, char* argv[]) {
         /*** MEMORY ***/
 
         // || || etc. below
-        bool is_load = is_reg_movq_memF;
+        bool is_load = is_reg_movq_memF || is_imm_movq_memF;
         // read from memory if needed
         // Not implemented yet!
         val mem_out = memory_read(mem, agen_result, is_load);
@@ -172,7 +194,10 @@ int main(int argc, char* argv[]) {
         /*** WRITE ***/
         // choose result to write back to register
         //RESULT SELECT
-        val datapath_result = or(use_if(is_imm_arith, op_arith), use_if(is_imm_movq, op_b));
+        val datapath_result = or(or(use_if(is_imm_arith, op_arith), 
+        use_if(is_reg_movq || is_imm_movq , op_b)), use_if(is_imm_movq_memF, mem_out));
+
+        
 
         // val datapath_result = op_b;
 
@@ -180,7 +205,7 @@ int main(int argc, char* argv[]) {
         reg_write(regs, reg_d, datapath_result, reg_wr_enable);
 
         // write to memory if needed
-        bool is_store = is_reg_movq_memT;
+        bool is_store = is_reg_movq_memT || is_imm_movq_memT;
         // Not implemented yet!
         memory_write(mem, agen_result, reg_out_a, is_store);
 
