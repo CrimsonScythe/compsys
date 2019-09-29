@@ -1,0 +1,3 @@
+test:
+    movq 8(%rsp), %eax
+    movq %eax, 8(%rdx)
