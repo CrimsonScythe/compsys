@@ -74,6 +74,7 @@ val alu_execute(val op, val op_a, val op_b) {
 
 val address_generate(val op_z_or_d, val op_s, val imm, val shift_amount,
 		     bool sel_z_or_d, bool sel_s, bool sel_imm) {
+                 
     val val_a = use_if(sel_z_or_d, op_z_or_d);
     val val_b = use_if(sel_s, op_s);
     val val_imm = use_if(sel_imm, imm);

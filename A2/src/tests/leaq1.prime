@@ -1,0 +1,3 @@
+test:
+    leaq (%rsi), %rdx
+    leaq (, %rsi, 2), %rax
