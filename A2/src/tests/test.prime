@@ -1,9 +1,4 @@
 test:
-.LFB0:
     subq $8, %rsp
-    movq %r11, (%rsp)
-    movq $0, %eax
-    movq (%rsp), %r11
     addq $8, %rsp
-    ret %r11
-.LFE0:
+

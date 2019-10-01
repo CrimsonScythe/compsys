@@ -195,7 +195,8 @@ int main(int argc, char* argv[]) {
         // choose result to write back to register
         //RESULT SELECT
         val datapath_result = or(or(use_if(is_imm_arith, op_arith), 
-        use_if(is_reg_movq || is_imm_movq , op_b)), use_if(is_imm_movq_memF, mem_out));
+        use_if(is_reg_movq || is_imm_movq , op_b)), 
+        use_if(is_imm_movq_memF, mem_out));
 
         
 
