@@ -1,0 +1,7 @@
+test:
+    leaq 1, %rsi
+    leaq 5(%rsi), %rdi
+    leaq -5, %rdi
+    leaq 4294967295, %rdx 
+    leaq 5(%rsp), %rdi
+    ret %r11

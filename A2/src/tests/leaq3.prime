@@ -1,2 +1,12 @@
 test:
-    leaq(%rax, %rsi, 2), %r11
+    movq $2, %rdi
+    leaq (, %rdi, 1), %rax
+    leaq (, %rax, 2), %rdi
+    leaq (, %rsi, 4), %rsp
+    leaq (, %rsp, 8), %rsi
+    leaq(%rdi, %rsi, 1), %rsp
+    leaq(%rax, %rsi, 2), %rcx
+    leaq(%rax, %rsi, 4), %rdx
+    leaq(%rax, %rsi, 8), %rsi
+    ret %r11
+        

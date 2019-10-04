@@ -1,3 +1,5 @@
 test:
-    leaq (, %rsi, 2), %rax
-    
+    movq $3, %rsi
+    leaq (%rsi), %rdx
+    leaq (%rdx), %rsi
+    ret %r11

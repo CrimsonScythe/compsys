@@ -1,2 +1,0 @@
-test:
-  movq 8(%rsi), %rdx

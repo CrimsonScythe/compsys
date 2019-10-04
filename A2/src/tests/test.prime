@@ -1,4 +1,0 @@
-test:
-    subq $8, %rsp
-    addq $8, %rsp
-

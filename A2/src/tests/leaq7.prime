@@ -1,0 +1,6 @@
+test:
+    leaq 5(, %rax, 1), %rsp
+    leaq 5(%rax, %rdi, 1), %rdx
+    leaq 5(%rdx, %rdi, 2), %rsi
+    leaq 5(%rsi, %rdi, 4), %rbp
+    leaq 5(%rdx, %rbp, 8), %rcx

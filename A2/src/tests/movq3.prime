@@ -1,2 +1,0 @@
-test:  
-  movq %rdx, 8(%rdi)

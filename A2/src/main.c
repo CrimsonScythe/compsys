@@ -42,6 +42,8 @@
 #define LEAQ6_IMM      0x4
 #define LEAQ6_IMM_ADD  0X5
 
+#define LEAQ7_Z_ADD    0x7
+
 #define JMP 0xF
 #define CALL 0xE
 
@@ -123,6 +125,10 @@ int main(int argc, char* argv[]) {
         bool is_leaq2        = is(LEAQ2, major_op);
         bool is_leaq3        = is(LEAQ3, major_op);
         bool is_leaq6        = is(LEAQ6, major_op);
+        bool is_leaq7        = is(LEAQ7, major_op);
+
+       
+
         //decode instruction type
         // read minor operation code
         bool is_imm_arith_sub = is(SUB, minor_op);
@@ -138,12 +144,15 @@ int main(int argc, char* argv[]) {
         bool is_leaq3_mult_add = is_leaq3 && is(LEAQ3_MULT_ADD, minor_op);
 
         bool is_leaq6_imm = is_leaq6 && is(LEAQ6_IMM, minor_op);
-        bool is_leaq6_imm_add = is_leaq6 && is(LEAQ6_IMM, minor_op);
+        bool is_leaq6_imm_add = is_leaq6 && is(LEAQ6_IMM_ADD, minor_op);
+        // bool is_leaq7_z       = is_leaq7 && is(LEAQ7_Z,minor_op);
+        bool is_leaq7_add     = is_leaq7 && is(LEAQ7_Z_ADD, minor_op);
 
         // determine instruction size
         bool size2 = is_return || is_reg_movq || is_reg_movq_mem || is_leaq2 || is_leaq3;
         bool size6 = is_imm_movq || is_imm_arith || is_imm_movq_mem || is_leaq6;   
         bool size3 = is_leaq3;
+        bool size7 = is_leaq7;
 
 
         val ins_size = 
@@ -152,8 +161,14 @@ int main(int argc, char* argv[]) {
             use_if(size2, from_int(2)),
             use_if(size6, from_int(6))
             ) ,
-            use_if(size3, from_int(3))
+            or(
+            use_if(size3, from_int(3)),
+            use_if(size7, from_int(7))
+            )
             );
+
+        // printf("%d", is_leaq7_add);
+          
 
         // setting up operand fetch and register read and write for the datapath:
 	    bool use_imm = is_imm_movq || is_imm_arith;
@@ -162,7 +177,7 @@ int main(int argc, char* argv[]) {
         // - write is always to reg_d
         bool reg_wr_enable = is_reg_movq || 
         is_imm_movq || is_imm_arith || is_reg_movq_memF || is_imm_movq_memF || 
-        is_leaq2 || is_leaq3 || is_leaq6;
+        is_leaq2 || is_leaq3 || is_leaq6 || is_leaq7;
 
         // Datapath:
         //
@@ -170,9 +185,18 @@ int main(int argc, char* argv[]) {
         val imm_offset_2 = or(or(put_bits(0, 8, inst_bytes[2]), put_bits(8,8, inst_bytes[3])),
                               or(put_bits(16, 8, inst_bytes[4]), put_bits(24,8, inst_bytes[5])));
         val imm_i = imm_offset_2; // <--- could be more
-        val sext_imm_i = sign_extend(31, imm_i);
+        // val sext_imm_i = sign_extend(31, imm_i);
 
-        // printf("immediate %x\n", imm_i);
+        val imm_offset_3 = or(or(put_bits(0, 8, inst_bytes[3]), put_bits(8,8, inst_bytes[4])),
+                              or(put_bits(16, 8, inst_bytes[5]), put_bits(24,8, inst_bytes[6])));
+        val imm_i_3 = imm_offset_3; // <--- could be more
+        // val sext_imm_i_3 = sign_extend(31, imm_i_3);
+
+
+        val sext_imm_i = or(use_if(!is_leaq7, sign_extend(31, imm_i)),
+         use_if(is_leaq7, sign_extend(31, imm_i_3)));
+
+        printf("immediate %x\n", sext_imm_i);
 
         /*** EXECUTE ***/
         // read registers
@@ -194,21 +218,22 @@ int main(int argc, char* argv[]) {
  
         
         // shift amount only if leaq3
-        bool is_shift = is_leaq3; 
+        bool is_shift = is_leaq3 || is_leaq7; 
         val shift_amount = use_if(is_shift, shift_v); 
 
-        // if leaq3 then use register z for computation, write reg is still reg b
-        val reg_wr_agenerate = or(use_if(is_leaq3, reg_out_z), reg_out_a);
+        // if leaq3 or leaq7 then use register z for computation, write reg is still reg b
+        val reg_wr_agenerate = or(use_if(is_leaq3 || is_leaq7, reg_out_z), reg_out_a);
 
-        bool add_to_shifted = is_leaq3_mult_add;
+        bool add_to_shifted = is_leaq3_mult_add || is_leaq7_add;
         
         
+        //test if below works if is_leaq7_add is not added to add_to_shifted
 
         val agen_result = address_generate(reg_wr_agenerate, reg_out_b,
          sext_imm_i, shift_amount,
         is_shift,
         is_imm_movq_mem || is_reg_movq_mem || is_leaq2 || add_to_shifted || is_leaq6_imm_add,
-        is_imm_movq_memF || is_imm_movq_memT || is_leaq6);   
+        is_imm_movq_memF || is_imm_movq_memT || is_leaq6 || is_leaq7);   
         // ....
 
         // address of succeeding instruction in memory
@@ -237,15 +262,16 @@ int main(int argc, char* argv[]) {
             ), 
             or(
                 use_if(is_imm_movq_memF, mem_out),
-                use_if(is_leaq2 || is_leaq3 || is_leaq6, agen_result)
+                use_if(is_leaq2 || is_leaq3 || is_leaq6 || is_leaq7, agen_result)
             ));
         
 
         // val datapath_result = op_b;
-
+        printf("result to write %d\n", datapath_result);
+        
         // write to register if needed
         reg_write(regs, reg_d, datapath_result, reg_wr_enable);
-
+        printf("read from reg %d\n", reg_read(regs, reg_read_dz));
         // write to memory if needed
         bool is_store = is_reg_movq_memT || is_imm_movq_memT;
         // Not implemented yet!
