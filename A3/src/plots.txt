@@ -1,0 +1,45 @@
+cache misses in L2 and L1(D-cache)
+for simple realsitic and simple magic
+
+sorting data set:
+10 100 1000 10000
+
+realistic:
+    heapsort:
+
+    L1  (D-cache): misses:11 rate:0.028571
+    L2           : misses:37 rate:1.000000
+
+    quicksort:
+
+    L1  (D-cache): misses:37 rate:1.000000
+    L2           :
+
+    mergesort:
+
+    L1  (D-cache):
+    L2           :
+
+magic: 
+	heapsort:
+
+    L1  (D-cache):
+    L2           :
+
+	quicksort:
+
+    L1  (D-cache):
+    L2           :
+
+	mergesort:
+
+    L1  (D-cache):
+    L2           :
+
+
+
+ command:
+    ./run-performance.sh heapsort simplemagic
+    ./run-performance.sh heapsort simplereal
+   
+

@@ -1,0 +1,299 @@
+<pre><font color="#8AE234"><b>kamal@kamal-Lenovo-Y520-15IKBN</b></font>:<font color="#729FCF"><b>~</b></font>$ cd compsys/A3/src/
+<font color="#8AE234"><b>kamal@kamal-Lenovo-Y520-15IKBN</b></font>:<font color="#729FCF"><b>~/compsys/A3/src</b></font>$ ./run-performance.sh heapsort simplemagic
+gcc -Wall -Wextra -pedantic -Winline -Og -fno-optimize-sibling-calls -S heapsort.c
+primify heapsort.s
+prasm heapsort.prime
+
+Machine
+-------
+
+Sorting with heapsort
+====================================
+
+ - sorting 10 entries
+   ------------------
+
+Branch predictions:      151   miss       70    missrate: 0.463576
+Return predictions:       44   miss        0    missrate: 0.000000
+L2-Cache reads:       27   writes:       10   miss:       37   missrate: 1.000000
+I-Cache reads:      1142   writes:        0   miss:       26   missrate: 0.022767
+D-Cache reads:       224   writes:      161   miss:       11   missrate: 0.028571
+Execution finished at cycle 1561
+
+ - sorting 100 entries
+   ------------------
+
+Branch predictions:     3061   miss      617    missrate: 0.201568
+Return predictions:      359   miss        0    missrate: 0.000000
+L2-Cache reads:       27   writes:       55   miss:       82   missrate: 1.000000
+I-Cache reads:     17683   writes:        0   miss:       26   missrate: 0.001470
+D-Cache reads:      3624   writes:     2044   miss:       56   missrate: 0.009880
+Execution finished at cycle 22835
+
+ - sorting 1000 entries
+   ------------------
+
+Branch predictions:    46846   miss     5910    missrate: 0.126158
+Return predictions:     3509   miss        0    missrate: 0.000000
+L2-Cache reads:       27   writes:      505   miss:      532   missrate: 1.000000
+I-Cache reads:    250866   writes:        0   miss:       26   missrate: 0.000104
+D-Cache reads:     52354   writes:    26706   miss:      506   missrate: 0.006400
+Execution finished at cycle 316696
+
+ - sorting 10000 entries
+   ------------------
+
+Branch predictions:   634950   miss    72757    missrate: 0.114587
+Return predictions:    35009   miss        0    missrate: 0.000000
+L2-Cache reads:    35971   writes:     5005   miss:     5033   missrate: 0.122828
+I-Cache reads:   3273373   writes:        0   miss:       26   missrate: 0.000008
+D-Cache reads:    689957   writes:   333440   miss:    40950   missrate: 0.040014
+Execution finished at cycle 4152265
+<font color="#8AE234"><b>kamal@kamal-Lenovo-Y520-15IKBN</b></font>:<font color="#729FCF"><b>~/compsys/A3/src</b></font>$ ./run-performance.sh quicksort simplemagic
+prasm quicksort.prime
+
+Machine
+-------
+
+Sorting with quicksort
+====================================
+
+ - sorting 10 entries
+   ------------------
+
+Branch predictions:       91   miss       44    missrate: 0.483516
+Return predictions:       31   miss        0    missrate: 0.000000
+L2-Cache reads:       26   writes:        9   miss:       35   missrate: 1.000000
+I-Cache reads:       658   writes:        0   miss:       25   missrate: 0.037994
+D-Cache reads:       111   writes:       85   miss:       10   missrate: 0.051020
+Execution finished at cycle 925
+
+ - sorting 100 entries
+   ------------------
+
+Branch predictions:     1527   miss      633    missrate: 0.414538
+Return predictions:      247   miss        3    missrate: 0.012146
+L2-Cache reads:       26   writes:       64   miss:       90   missrate: 1.000000
+I-Cache reads:      8661   writes:        0   miss:       25   missrate: 0.002887
+D-Cache reads:      1524   writes:      897   miss:       65   missrate: 0.026848
+Execution finished at cycle 13450
+
+ - sorting 1000 entries
+   ------------------
+
+Branch predictions:    19947   miss     6664    missrate: 0.334085
+Return predictions:     2457   miss       14    missrate: 0.005698
+L2-Cache reads:       26   writes:      523   miss:      549   missrate: 1.000000
+I-Cache reads:    107392   writes:        0   miss:       25   missrate: 0.000233
+D-Cache reads:     19105   writes:    10510   miss:      524   missrate: 0.017694
+Execution finished at cycle 167048
+
+ - sorting 10000 entries
+   ------------------
+
+Branch predictions:   255327   miss    72331    missrate: 0.283288
+Return predictions:    24363   miss      142    missrate: 0.005829
+L2-Cache reads:    10253   writes:     5186   miss:     5066   missrate: 0.328130
+I-Cache reads:   1320665   writes:        0   miss:       25   missrate: 0.000019
+D-Cache reads:    239129   writes:   120937   miss:    15414   missrate: 0.042809
+Execution finished at cycle 2067875
+<font color="#8AE234"><b>kamal@kamal-Lenovo-Y520-15IKBN</b></font>:<font color="#729FCF"><b>~/compsys/A3/src</b></font>$ ./run-performance.sh mergesort simplemagic
+gcc -Wall -Wextra -pedantic -Winline -Og -fno-optimize-sibling-calls -S mergesort.c
+primify mergesort.s
+prasm mergesort.prime
+
+Machine
+-------
+
+Sorting with mergesort
+====================================
+
+ - sorting 10 entries
+   ------------------
+
+Branch predictions:      191   miss       99    missrate: 0.518325
+Return predictions:       22   miss        0    missrate: 0.000000
+L2-Cache reads:       29   writes:       10   miss:       39   missrate: 1.000000
+I-Cache reads:       922   writes:        0   miss:       28   missrate: 0.030369
+D-Cache reads:       125   writes:      103   miss:       11   missrate: 0.048246
+Execution finished at cycle 1388
+
+ - sorting 100 entries
+   ------------------
+
+Branch predictions:     3111   miss      493    missrate: 0.158470
+Return predictions:      115   miss        0    missrate: 0.000000
+L2-Cache reads:       29   writes:       55   miss:       84   missrate: 1.000000
+I-Cache reads:     10813   writes:        0   miss:       28   missrate: 0.002589
+D-Cache reads:      1614   writes:     1058   miss:       56   missrate: 0.020958
+Execution finished at cycle 13683
+
+ - sorting 1000 entries
+   ------------------
+
+Branch predictions:    42077   miss     5168    missrate: 0.122822
+Return predictions:     1018   miss        0    missrate: 0.000000
+L2-Cache reads:       29   writes:      505   miss:      534   missrate: 1.000000
+I-Cache reads:    129496   writes:        0   miss:       28   missrate: 0.000216
+D-Cache reads:     20772   writes:    12073   miss:      506   missrate: 0.015406
+Execution finished at cycle 163620
+
+ - sorting 10000 entries
+   ------------------
+
+Branch predictions:   577453   miss    64413    missrate: 0.111547
+Return predictions:    10022   miss        0    missrate: 0.000000
+L2-Cache reads:    35061   writes:    37505   miss:    61832   missrate: 0.852079
+I-Cache reads:   1685392   writes:        0   miss:       28   missrate: 0.000017
+D-Cache reads:    283798   writes:   160093   miss:    72538   missrate: 0.163414
+Execution finished at cycle 2121519
+<font color="#8AE234"><b>kamal@kamal-Lenovo-Y520-15IKBN</b></font>:<font color="#729FCF"><b>~/compsys/A3/src</b></font>$ ./run-performance.sh heapsort simplereal
+gcc -Wall -Wextra -pedantic -Winline -Og -fno-optimize-sibling-calls -S heapsort.c
+primify heapsort.s
+prasm heapsort.prime
+
+Machine
+-------
+
+Sorting with heapsort
+====================================
+
+ - sorting 10 entries
+   ------------------
+
+Branch predictions:      151   miss       70    missrate: 0.463576
+Return predictions:       44   miss        0    missrate: 0.000000
+L2-Cache reads:       27   writes:       10   miss:       37   missrate: 1.000000
+I-Cache reads:      1142   writes:        0   miss:       26   missrate: 0.022767
+D-Cache reads:       224   writes:      161   miss:       11   missrate: 0.028571
+Execution finished at cycle 3335
+
+ - sorting 100 entries
+   ------------------
+
+Branch predictions:     3061   miss      617    missrate: 0.201568
+Return predictions:      359   miss        0    missrate: 0.000000
+L2-Cache reads:       27   writes:       55   miss:       82   missrate: 1.000000
+I-Cache reads:     17683   writes:        0   miss:       26   missrate: 0.001470
+D-Cache reads:      3624   writes:     2044   miss:       56   missrate: 0.009880
+Execution finished at cycle 24609
+
+ - sorting 1000 entries
+   ------------------
+
+Branch predictions:    46846   miss     5910    missrate: 0.126158
+Return predictions:     3509   miss        0    missrate: 0.000000
+L2-Cache reads:       27   writes:      505   miss:      532   missrate: 1.000000
+I-Cache reads:    250866   writes:        0   miss:       26   missrate: 0.000104
+D-Cache reads:     52354   writes:    26706   miss:      506   missrate: 0.006400
+Execution finished at cycle 318470
+
+ - sorting 10000 entries
+   ------------------
+
+Branch predictions:   634950   miss    72757    missrate: 0.114587
+Return predictions:    35009   miss        0    missrate: 0.000000
+L2-Cache reads:    35971   writes:     5005   miss:     5033   missrate: 0.122828
+I-Cache reads:   3273373   writes:        0   miss:       26   missrate: 0.000008
+D-Cache reads:    689957   writes:   333440   miss:    40950   missrate: 0.040014
+Execution finished at cycle 4552777
+<font color="#8AE234"><b>kamal@kamal-Lenovo-Y520-15IKBN</b></font>:<font color="#729FCF"><b>~/compsys/A3/src</b></font>$ ./run-performance.sh quicksort simplereal
+prasm quicksort.prime
+
+Machine
+-------
+
+Sorting with quicksort
+====================================
+
+ - sorting 10 entries
+   ------------------
+
+Branch predictions:       91   miss       44    missrate: 0.483516
+Return predictions:       31   miss        0    missrate: 0.000000
+L2-Cache reads:       26   writes:        9   miss:       35   missrate: 1.000000
+I-Cache reads:       658   writes:        0   miss:       25   missrate: 0.037994
+D-Cache reads:       111   writes:       85   miss:       10   missrate: 0.051020
+Execution finished at cycle 2810
+
+ - sorting 100 entries
+   ------------------
+
+Branch predictions:     1527   miss      633    missrate: 0.414538
+Return predictions:      247   miss        3    missrate: 0.012146
+L2-Cache reads:       26   writes:       64   miss:       90   missrate: 1.000000
+I-Cache reads:      8661   writes:        0   miss:       25   missrate: 0.002887
+D-Cache reads:      1524   writes:      897   miss:       65   missrate: 0.026848
+Execution finished at cycle 15336
+
+ - sorting 1000 entries
+   ------------------
+
+Branch predictions:    19947   miss     6664    missrate: 0.334085
+Return predictions:     2457   miss       14    missrate: 0.005698
+L2-Cache reads:       26   writes:      523   miss:      549   missrate: 1.000000
+I-Cache reads:    107392   writes:        0   miss:       25   missrate: 0.000233
+D-Cache reads:     19105   writes:    10510   miss:      524   missrate: 0.017694
+Execution finished at cycle 168935
+
+ - sorting 10000 entries
+   ------------------
+
+Branch predictions:   255327   miss    72331    missrate: 0.283288
+Return predictions:    24363   miss      142    missrate: 0.005829
+L2-Cache reads:    10253   writes:     5186   miss:     5066   missrate: 0.328130
+I-Cache reads:   1320665   writes:        0   miss:       25   missrate: 0.000019
+D-Cache reads:    239129   writes:   120937   miss:    15414   missrate: 0.042809
+Execution finished at cycle 2192290
+<font color="#8AE234"><b>kamal@kamal-Lenovo-Y520-15IKBN</b></font>:<font color="#729FCF"><b>~/compsys/A3/src</b></font>$ ./run-performance.sh mergesort simplereal
+gcc -Wall -Wextra -pedantic -Winline -Og -fno-optimize-sibling-calls -S mergesort.c
+primify mergesort.s
+prasm mergesort.prime
+
+Machine
+-------
+
+Sorting with mergesort
+====================================
+
+ - sorting 10 entries
+   ------------------
+
+Branch predictions:      191   miss       99    missrate: 0.518325
+Return predictions:       22   miss        0    missrate: 0.000000
+L2-Cache reads:       29   writes:       10   miss:       39   missrate: 1.000000
+I-Cache reads:       922   writes:        0   miss:       28   missrate: 0.030369
+D-Cache reads:       125   writes:      103   miss:       11   missrate: 0.048246
+Execution finished at cycle 3488
+
+ - sorting 100 entries
+   ------------------
+
+Branch predictions:     3111   miss      493    missrate: 0.158470
+Return predictions:      115   miss        0    missrate: 0.000000
+L2-Cache reads:       29   writes:       55   miss:       84   missrate: 1.000000
+I-Cache reads:     10813   writes:        0   miss:       28   missrate: 0.002589
+D-Cache reads:      1614   writes:     1058   miss:       56   missrate: 0.020958
+Execution finished at cycle 15895
+
+ - sorting 1000 entries
+   ------------------
+
+Branch predictions:    42077   miss     5168    missrate: 0.122822
+Return predictions:     1018   miss        0    missrate: 0.000000
+L2-Cache reads:       29   writes:      505   miss:      534   missrate: 1.000000
+I-Cache reads:    129496   writes:        0   miss:       28   missrate: 0.000216
+D-Cache reads:     20772   writes:    12073   miss:      506   missrate: 0.015406
+Execution finished at cycle 165720
+
+ - sorting 10000 entries
+   ------------------
+
+Branch predictions:   577453   miss    64413    missrate: 0.111547
+Return predictions:    10022   miss        0    missrate: 0.000000
+L2-Cache reads:    35061   writes:    37505   miss:    61832   missrate: 0.852079
+I-Cache reads:   1685392   writes:        0   miss:       28   missrate: 0.000017
+D-Cache reads:    283798   writes:   160093   miss:    72538   missrate: 0.163414
+Execution finished at cycle 4995219
+<font color="#8AE234"><b>kamal@kamal-Lenovo-Y520-15IKBN</b></font>:<font color="#729FCF"><b>~/compsys/A3/src</b></font>$ 
+</pre>
