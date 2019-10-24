@@ -37,29 +37,24 @@ void merge_runs(long total_size, long run_size, long from[], long to[]) {
 
 void mergeArrays(long arr1[], long arr2[], long n1, long n2, long arr3[]) { 
 
-    long i = 0;
-    long j = 0;
-    long k = 0; 
+    long* end = arr1 + n1;
+    long* end2 = arr2 + n2;
 
     while (1) 
     { 
-      if (i < n1)
+      if (arr1 < end)
       {
-        if (j < n2)
+        if (arr2 < end2)
         {
         if (*arr1 < *arr2){ 
             *arr3 = *arr1;
             arr3++;
             arr1++;
-            i++;
-            k++;
             }
         else{
             *arr3=*arr2;
             arr3++;
             arr2++;
-            k++;
-            j++;
             }
 
         } else
@@ -76,23 +71,16 @@ void mergeArrays(long arr1[], long arr2[], long n1, long n2, long arr3[]) {
     }
 
   
-  
-    while (i < n1) {
+    while (arr1 < end) {
         *arr3=*arr1;
         arr3++;
         arr1++;
-        k++;
-        i++;
-
       }
 
-    while (j < n2){ 
+    while (arr2 < end2){ 
         *arr3=*arr2;
         arr3++;
         arr2++;
-        k++;
-        j++;
-
         }
         
 } 
