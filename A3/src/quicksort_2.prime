@@ -151,11 +151,11 @@ quick_sort:
     subq $16, %rsp
     movq %r11, 8(%rsp)
     movq %r15, (%rsp)
-    cble %rdx, %rsi, .L35
     movq %rdx, %r8
     subq %rsi, %r8
-    cbl $7, %r8, .L22
     leaq (%rdi, %rsi, 8), %rcx
+    cble %rdx, %rsi, .L35
+    cbl $7, %r8, .L22
     movq $1, %edi
     jmp .L23
 .L27:
@@ -168,18 +168,18 @@ quick_sort:
     subq $1, %rax
     movq %rdx, (%r15)    
 .L24:
-    cbg $0, %rax, .L25
     leaq (%rcx, %rax, 8), %r15
     movq (%r15), %rdx
+    cbg $0, %rax, .L25
     cbg %rdx, %rsi, .L26
 .L25:
     leaq 8(%rcx, %rax, 8), %r15
     addq $1, %rdi
     movq %rsi, (%r15)
 .L23:
-    cble %rdi, %r8, .L27
-    movq (%rsp), %r15
     movq 8(%rsp), %r11
+    movq (%rsp), %r15
+    cble %rdi, %r8, .L27
     addq $16, %rsp
     ret %r11
 .L22:
@@ -205,11 +205,11 @@ quick_sort:
     leaq -1(%rbx), %rax
     leaq (%rdi, %rax, 8), %rcx
     movq (%rcx), %r8
+    movq %rax, %rbx
     cbg %r8, %r9, .L32
     cble %rax, %r10, .L31
     movq %r8, 0(%rbp)
     movq %r11, (%rcx)
-    movq %rax, %rbx
     jmp .L28
 .L31:
     movq %rdx, %r12
