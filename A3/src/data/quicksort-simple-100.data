@@ -4,4 +4,4 @@ Return predictions:      247   miss        3    missrate: 0.012146
 L2-Cache reads:       26   writes:       64   miss:       90   missrate: 1.000000
 I-Cache reads:      8551   writes:        0   miss:       25   missrate: 0.002924
 D-Cache reads:      1432   writes:      954   miss:       65   missrate: 0.027242
-Execution finished at cycle 13168 (CPI = 1.539937)
+Execution finished at cycle 15870 (CPI = 1.855923)

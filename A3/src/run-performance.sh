@@ -74,7 +74,7 @@ mkdir -p runs
 rm -f runs/*
 
 # Number for elements to be sorted (to be extended)
-elements="100 1000 10000 20000 40000 100000"
+elements="100 1000 10000 20000 25000 30000 35000 40000"
 
 # Generate files with inputs for things to be sorted
 for elem in ${elements}

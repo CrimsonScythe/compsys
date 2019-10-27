@@ -223,42 +223,38 @@ mergeArrays:
 .LFB12:
     subq $8, %rsp
     movq %r11, (%rsp)
-    movq $0, %r9d
-    movq $0, %eax
+    leaq (%rdi, %rdx, 8), %r9
+    leaq (%rsi, %rcx, 8), %rcx
     jmp .L38
 .L40:
-    movq %r10, (%r8)
+    movq %rax, (%r8)
     addq $8, %r8
     addq $8, %rsi
-    addq $1, %r9
 .L38:
-    cble %rdx, %rax, .L42
-    cble %rcx, %r9, .L42
-    movq (%rdi), %r11
-    movq (%rsi), %r10
-    cble %r10, %r11, .L40
-    movq %r11, (%r8)
+    cbbe %r9, %rdi, .L42
+    cbbe %rcx, %rsi, .L42
+    movq (%rdi), %rdx
+    movq (%rsi), %rax
+    cble %rax, %rdx, .L40
+    movq %rdx, (%r8)
     addq $8, %r8
     addq $8, %rdi
-    addq $1, %rax
     jmp .L38
 .L43:
-    movq (%rdi), %r10
-    movq %r10, (%r8)
+    movq (%rdi), %rax
+    movq %rax, (%r8)
     addq $8, %r8
     addq $8, %rdi
-    addq $1, %rax
 .L42:
-    cbg %rdx, %rax, .L43
+    cba %r9, %rdi, .L43
     jmp .L44
 .L45:
     movq (%rsi), %rax
     movq %rax, (%r8)
     addq $8, %r8
     addq $8, %rsi
-    addq $1, %r9
 .L44:
-    cbg %rcx, %r9, .L45
+    cba %rcx, %rsi, .L45
     movq (%rsp), %r11
     addq $8, %rsp
     ret %r11

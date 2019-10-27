@@ -4,7 +4,7 @@
 set -e
 
 # Change this if working on optimizing heapsort to algorithm=heapsort_2
-algorithm=quicksort_2
+algorithm=mergesort_2
 # Make sure that the latest version of the implementation
 make ${algorithm}
 # Quicksort is needed for reference.

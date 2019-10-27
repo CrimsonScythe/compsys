@@ -295,47 +295,43 @@ merge_runs:
 mergeArrays:
 .LFB12:
 	.cfi_startproc
-	movl	$0, %r9d
-	movl	$0, %eax
+	leaq	(%rdi,%rdx,8), %r9
+	leaq	(%rsi,%rcx,8), %rcx
 	jmp	.L38
 .L40:
-	movq	%r10, (%r8)
+	movq	%rax, (%r8)
 	addq	$8, %r8
 	addq	$8, %rsi
-	addq	$1, %r9
 .L38:
-	cmpq	%rdx, %rax
-	jge	.L42
-	cmpq	%rcx, %r9
-	jge	.L42
-	movq	(%rdi), %r11
-	movq	(%rsi), %r10
-	cmpq	%r10, %r11
+	cmpq	%r9, %rdi
+	jnb	.L42
+	cmpq	%rcx, %rsi
+	jnb	.L42
+	movq	(%rdi), %rdx
+	movq	(%rsi), %rax
+	cmpq	%rax, %rdx
 	jge	.L40
-	movq	%r11, (%r8)
+	movq	%rdx, (%r8)
 	addq	$8, %r8
 	addq	$8, %rdi
-	addq	$1, %rax
 	jmp	.L38
 .L43:
-	movq	(%rdi), %r10
-	movq	%r10, (%r8)
+	movq	(%rdi), %rax
+	movq	%rax, (%r8)
 	addq	$8, %r8
 	addq	$8, %rdi
-	addq	$1, %rax
 .L42:
-	cmpq	%rdx, %rax
-	jl	.L43
+	cmpq	%r9, %rdi
+	jb	.L43
 	jmp	.L44
 .L45:
 	movq	(%rsi), %rax
 	movq	%rax, (%r8)
 	addq	$8, %r8
 	addq	$8, %rsi
-	addq	$1, %r9
 .L44:
-	cmpq	%rcx, %r9
-	jl	.L45
+	cmpq	%rcx, %rsi
+	jb	.L45
 	rep ret
 	.cfi_endproc
 .LFE12:
