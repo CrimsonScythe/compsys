@@ -13,9 +13,10 @@ void string_stream(const void *arg, FILE *out) {
 void save_stream(void *arg, FILE *in) {
   /* We will be writing bytes to this location. */
   unsigned char *d = arg;
-
+// printf("%s", "l");
   while (fread(d, sizeof(unsigned char), 1, in) == 1) {
     d++; /* Move location ahead by one byte. */
+    
   }
 }
 
