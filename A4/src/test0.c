@@ -7,10 +7,13 @@
 #include <string.h>
 
 void string_stream(const void *arg, FILE *out) {
+ printf("%s", "stream");
   fputs((const char*) arg, out);
+
 }
 
 void save_stream(void *arg, FILE *in) {
+  printf("%s", "save");
   /* We will be writing bytes to this location. */
   unsigned char *d = arg;
 // printf("%s", "l");
@@ -28,6 +31,7 @@ int main() {
   output[strlen(input)] = '\0'; /* Ensure terminating NULL. */
 
   assert(transducers_link_source(&s[0], string_stream, input) == 0);
+  printf("%s", "conmt");
   assert(transducers_link_sink(save_stream, output, s[0]) == 0);
   
   /* We cannot use the '==' operator for comparing strings, as strings

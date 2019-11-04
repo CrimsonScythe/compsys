@@ -34,22 +34,31 @@ static int file_pipe(FILE* files[2]) {
 
 int transducers_link_source(stream **out,
                             transducers_source s, const void *arg) { 
-  
+
   FILE* files[2];
-  // FILE* streams[2];
   file_pipe(files);
+
   if(fork() == 0){
     // read
+          // printf("%s", "child");     
+          fclose(files[0]);    
         s(arg, files[1]);
-        exit(0);   
+        exit(0); 
+      
 
   } else {
+    //  printf("%s", "parent");  
     //write
+    //close other pipe end here
+    fclose(files[1]);
      *out = malloc(sizeof(files));
     (*out)->file = files[0];
-  }
-  exit(0);
 
+  }
+  
+  // exit(0);
+  // DON#T EXIT IN PARENT, SINK FUNCTION AND
+  // SUBSEQUENT FUNCTION CALLS DO NOT GET THROUGH
 
 //will create a stream object and write its address to the given pointer variable
 
@@ -58,8 +67,9 @@ int transducers_link_source(stream **out,
 
 int transducers_link_sink(transducers_sink s, void *arg,
                           stream *in) {
+    // printf("%s", "sink");         
+
   s(arg,in->file);    
-                        
   // s(in, arg);
   //fclose(in);
   // s=s; /* unused */
@@ -71,11 +81,33 @@ int transducers_link_sink(transducers_sink s, void *arg,
 int transducers_link_1(stream **out,
                        transducers_1 t, const void *arg,
                        stream* in) {
-  out=out; /* unused */
-  t=t; /* unused */
-  arg=arg; /* unused */
-  in=in; /* unused */
-  return 1;
+
+               
+
+  printf("%s", "link");         
+
+  FILE* files[2];
+  file_pipe(files);
+  if (fork() == 0)
+  {
+    fclose(files[0]);
+
+    t(arg, files[1], in->file);
+    // exit(0);
+  }
+  else {
+    fclose(files[1]);
+    
+    *out = malloc(sizeof(files));
+    (*out)->file = files[0];
+  }
+
+  // exit(0);
+  // out=out; /* unused */
+  // t=t; /* unused */
+  // arg=arg; /* unused */
+  // in=in; /* unused */
+  return 0;
 }
 
 int transducers_link_2(stream **out,
