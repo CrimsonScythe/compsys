@@ -1,0 +1,24 @@
+00000000 :                       #  test:
+00000000 : 640001000000          #      movq $1, %rax
+00000006 : 646001000000          #      movq $1, %rdi
+0000000c : 1060                  #      addq %rax, %rdi
+0000000e : 2116                  #      movq %rdi, %rbx
+00000010 : 1160                  #      subq %rax, %rdi
+00000012 : 2116                  #      movq %rdi, %rbx
+00000014 : 1260                  #      andq %rax, %rdi
+00000016 : 2116                  #      movq %rdi, %rbx
+00000018 : 1360                  #      orq %rax, %rdi
+0000001a : 2116                  #      movq %rdi, %rbx
+0000001c : 1460                  #      xorq %rax, %rdi
+0000001e : 2116                  #      movq %rdi, %rbx
+00000020 : 1560                  #      mulq %rax, %rdi
+00000022 : 2116                  #      movq %rdi, %rbx
+00000024 : 1660                  #      sarq %rax, %rdi
+00000026 : 2116                  #      movq %rdi, %rbx
+00000028 : 1760                  #      salq %rax, %rdi
+0000002a : 2116                  #      movq %rdi, %rbx
+0000002c : 1860                  #      shrq %rax, %rdi
+0000002e : 2116                  #      movq %rdi, %rbx
+00000030 : 1960                  #      imulq %rax, %rdi
+00000032 : 2116                  #      movq %rdi, %rbx
+00000034 : 000B                  #      ret %r11

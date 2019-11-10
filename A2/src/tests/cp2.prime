@@ -1,0 +1,9 @@
+test:
+    movq $-8, %rdi
+    movq $7, %rdx
+    movq $5, %rcx
+    cba %rdi,%rdx, return
+    jmp test
+return:
+    ret %rax
+   

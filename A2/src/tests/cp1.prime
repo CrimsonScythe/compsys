@@ -1,0 +1,17 @@
+test:
+    movq $5, %rdi
+    movq $4, %rdx
+    movq $5, %rcx
+    cbg %rdi,%rdx, target
+    movq $5, %rdx
+target:
+    cbge %rcx, %rdi, lar
+    movq $1, %rdi
+lar:
+    movq $1, %rdi
+    cbge %rcx, %rdx, return
+    jmp test
+    
+return:
+    ret %rax
+   

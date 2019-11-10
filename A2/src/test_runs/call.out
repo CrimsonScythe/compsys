@@ -1,0 +1,43 @@
+1 0
+targetaddress c
+immediate 64000000
+byte30
+byte40
+byte50
+byte664
+cbjump0compariosne
+pcnextis c
+target c
+pcincr c
+regoutb 0 
+yellow 0hello 0result to write 6 
+read from reg 6
+2 c
+targetaddress 0
+immediate 0
+byte30
+byte40
+byte50
+byte60
+cbjump0compariosn0
+pcnextis 12
+target 0
+pcincr 12
+regoutb 0 
+yellow 0hello 0result to write 5 
+read from reg 5
+3 12
+targetaddress 0
+immediate 0
+byte30
+byte40
+byte50
+byte60
+cbjump0compariosn0
+pcnextis 0
+target 0
+pcincr 14
+regoutb 0 
+yellow 0hello 0result to write 0 
+read from reg 0
+Done

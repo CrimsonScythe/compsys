@@ -1,0 +1,7 @@
+00000000 :                       #  test:
+00000000 : A45001000000          #      leaq 1, %rsi
+00000006 : A56505000000          #      leaq 5(%rsi), %rdi
+0000000c : A460fbffffff          #      leaq -5, %rdi
+00000012 : A430ffffffff          #      leaq 4294967295, %rdx
+00000018 : A56705000000          #      leaq 5(%rsp), %rdi
+0000001e : 000B                  #      ret %r11

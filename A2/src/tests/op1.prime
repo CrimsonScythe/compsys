@@ -1,0 +1,36 @@
+test:
+    movq $1, %rax
+    movq $1, %rdi
+
+    addq %rax, %rdi
+    movq %rdi, %rbx
+
+    subq %rax, %rdi
+    movq %rdi, %rbx
+
+    andq %rax, %rdi
+    movq %rdi, %rbx
+    
+    orq  %rax, %rdi
+    movq %rdi, %rbx
+    
+    xorq %rax, %rdi
+    movq %rdi, %rbx
+    
+    mulq %rax, %rdi
+    movq %rdi, %rbx
+    
+    sarq %rax, %rdi
+    movq %rdi, %rbx
+
+    salq %rax, %rdi
+    movq %rdi, %rbx
+
+    shrq %rax, %rdi
+    movq %rdi, %rbx
+
+    imulq %rax, %rdi
+    movq %rdi, %rbx
+
+
+    ret %r11

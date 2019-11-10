@@ -13,6 +13,12 @@ struct stream {
 void transducers_free_stream(stream *s) {
   // A stream
 // may only be freed once the transducer tree in which it is used has finished
+  //fclose
+  // if (s->hasReader == 1){
+  //   exit(0);
+  // }
+
+  fclose(s->file);
   free(s);
 }
 
@@ -42,6 +48,7 @@ int transducers_link_source(stream **out,
     // read
           // printf("%s", "child");     
           fclose(files[0]);    
+        
         s(arg, files[1]);
         exit(0); 
       
@@ -50,8 +57,10 @@ int transducers_link_source(stream **out,
     //  printf("%s", "parent");  
     //write
     //close other pipe end here
+
     fclose(files[1]);
-     *out = malloc(sizeof(files));
+     *out = malloc(sizeof(stream));
+     (*out)->hasReader = 0;
     (*out)->file = files[0];
 
   }
@@ -67,14 +76,13 @@ int transducers_link_source(stream **out,
 
 int transducers_link_sink(transducers_sink s, void *arg,
                           stream *in) {
-    // printf("%s", "sink");         
-
+    
+  // hasreader check
+  assert(in->hasReader == 0);
+  in->hasReader=1;
   s(arg,in->file);    
-  // s(in, arg);
-  //fclose(in);
-  // s=s; /* unused */
-  // arg=arg; /* unused */
-  // in=in; /* unused */
+  
+
   return 0;
 }
 
@@ -82,43 +90,61 @@ int transducers_link_1(stream **out,
                        transducers_1 t, const void *arg,
                        stream* in) {
 
-               
-
-  printf("%s", "link");         
-
+  // assert(transducers_link_1(&s[1], increment_stream, &inc, s[0]) == 0);
+  // stream* s[2]
+  // out  = &s[1]
+  // t = increment_stream()
+  // arg = &inc
+  // in = s[0]
+  
+  assert(in->hasReader == 0);
   FILE* files[2];
   file_pipe(files);
   if (fork() == 0)
   {
     fclose(files[0]);
-
+    in->hasReader = 1;
     t(arg, files[1], in->file);
-    // exit(0);
+    exit(0);
   }
   else {
-    fclose(files[1]);
-    
-    *out = malloc(sizeof(files));
+
+    fclose(files[1]);  
+    *out = malloc(sizeof(stream));
+    (*out)->hasReader = 0;
     (*out)->file = files[0];
   }
 
-  // exit(0);
-  // out=out; /* unused */
-  // t=t; /* unused */
-  // arg=arg; /* unused */
-  // in=in; /* unused */
+
   return 0;
 }
 
 int transducers_link_2(stream **out,
                        transducers_2 t, const void *arg,
                        stream* in1, stream* in2) {
-  out=out; /* unused */
-  t=t; /* unused */
-  arg=arg; /* unused */
-  in1=in1; /* unused */
-  in2=in2; /* unused */
-  return 1;
+  //out=out; /* unused */
+  //t=t; /* unused */
+  //arg=arg; /* unused */
+  //in1=in1; /* unused */
+  //in2=in2; /* unused */
+  
+  FILE* files[2];
+  file_pipe(files);
+
+  if (fork() == 0)
+  {
+    fclose(files[0]);
+    // in->hasReader = 1;
+    t(arg, files[1], in1->file, in2->file);
+    exit(0);
+  }
+  else {
+
+    fclose(files[1]);  
+    *out = malloc(sizeof(files));
+    (*out)->file = files[0];
+  }
+  return 0;
 }
 
 int transducers_dup(stream **out1, stream **out2,

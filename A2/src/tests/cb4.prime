@@ -1,0 +1,12 @@
+test:
+    movq $-8, %rdi
+    movq $7, %rdx
+    movq $8, %rcx
+    cbb %rdx,%rdi, tar
+    jmp test
+tar:
+    cbbe %rcx, %rdi, return
+    jmp test
+return:
+    ret %rax
+   

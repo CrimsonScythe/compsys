@@ -1,0 +1,85 @@
+1 0
+targetaddress 0
+immediate 5
+byte35
+byte40
+byte50
+byte60
+cbjump0compariosn0
+pcnextis 7
+target 0
+pcincr 7
+regoutb 0 
+yellow 0hello 5result to write 5 
+read from reg 5
+2 7
+targetaddress 0
+immediate 5
+byte35
+byte40
+byte50
+byte60
+cbjump0compariosn0
+pcnextis e
+target 0
+pcincr e
+regoutb 0 
+yellow 0hello 5result to write 5 
+read from reg 5
+3 e
+targetaddress 0
+immediate 5
+byte35
+byte40
+byte50
+byte60
+cbjump0compariosn0
+pcnextis 15
+target 0
+pcincr 15
+regoutb 5 
+yellow 0hello aresult to write a 
+read from reg 10
+4 15
+targetaddress 0
+immediate 5
+byte35
+byte40
+byte50
+byte60
+cbjump0compariosn0
+pcnextis 1c
+target 0
+pcincr 1c
+regoutb a 
+yellow 0hello fresult to write f 
+read from reg 15
+5 1c
+targetaddress 0
+immediate 5
+byte35
+byte40
+byte50
+byte60
+cbjump0compariosn0
+pcnextis 23
+target 0
+pcincr 23
+regoutb 5 
+yellow 0hello 82result to write 82 
+read from reg 130
+6 23
+targetaddress 0
+immediate 0
+byte30
+byte40
+byte50
+byte60
+cbjump0compariosn0
+pcnextis 0
+target 0
+pcincr 25
+regoutb 0 
+yellow 0hello 0result to write 0 
+read from reg 0
+Done

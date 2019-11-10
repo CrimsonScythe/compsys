@@ -1,0 +1,323 @@
+1 0
+targetaddress 0
+immediate 64000000
+byte30
+byte40
+byte50
+byte664
+cbjump0compariosn0
+pcnextis 6
+target 0
+pcincr 6
+regoutb 0 
+yellow 0hello 0result to write 1 
+read from reg 1
+2 6
+targetaddress 0
+immediate 10000000
+byte30
+byte40
+byte50
+byte610
+cbjump0compariosn0
+pcnextis c
+target 0
+pcincr c
+regoutb 1 
+yellow 0hello 0result to write 1 
+read from reg 1
+3 c
+targetaddress 0
+immediate 21601116
+byte316
+byte411
+byte560
+byte621
+cbjump0compariosn0
+pcnextis e
+target 0
+pcincr e
+regoutb 1 
+yellow 1hello 0result to write 2 
+read from reg 2
+4 e
+targetaddress 0
+immediate 12162160
+byte360
+byte421
+byte516
+byte612
+cbjump0compariosn0
+pcnextis 10
+target 0
+pcincr 10
+regoutb 2 
+yellow 0hello 0result to write 2 
+read from reg 2
+5 10
+targetaddress 0
+immediate 21601216
+byte316
+byte412
+byte560
+byte621
+cbjump0compariosn0
+pcnextis 12
+target 0
+pcincr 12
+regoutb 1 
+yellow 2hello 0result to write 1 
+read from reg 1
+6 12
+targetaddress 0
+immediate 13162160
+byte360
+byte421
+byte516
+byte613
+cbjump0compariosn0
+pcnextis 14
+target 0
+pcincr 14
+regoutb 1 
+yellow 2hello 0result to write 1 
+read from reg 1
+7 14
+targetaddress 0
+immediate 21601316
+byte316
+byte413
+byte560
+byte621
+cbjump0compariosn0
+pcnextis 16
+target 0
+pcincr 16
+regoutb 1 
+yellow 1hello 0result to write 1 
+read from reg 1
+8 16
+targetaddress 0
+immediate 14162160
+byte360
+byte421
+byte516
+byte614
+cbjump0compariosn0
+pcnextis 18
+target 0
+pcincr 18
+regoutb 1 
+yellow 1hello 0result to write 1 
+read from reg 1
+9 18
+targetaddress 0
+immediate 21601416
+byte316
+byte414
+byte560
+byte621
+cbjump0compariosn0
+pcnextis 1a
+target 0
+pcincr 1a
+regoutb 1 
+yellow 1hello 0result to write 1 
+read from reg 1
+10 1a
+targetaddress 0
+immediate 15162160
+byte360
+byte421
+byte516
+byte615
+cbjump0compariosn0
+pcnextis 1c
+target 0
+pcincr 1c
+regoutb 1 
+yellow 1hello 0result to write 1 
+read from reg 1
+11 1c
+targetaddress 0
+immediate 21601516
+byte316
+byte415
+byte560
+byte621
+cbjump0compariosn0
+pcnextis 1e
+target 0
+pcincr 1e
+regoutb 1 
+yellow 1hello 0result to write 0 
+read from reg 0
+12 1e
+targetaddress 0
+immediate 16162160
+byte360
+byte421
+byte516
+byte616
+cbjump0compariosn0
+pcnextis 20
+target 0
+pcincr 20
+regoutb 0 
+yellow 1hello 0result to write 0 
+read from reg 0
+13 20
+targetaddress 0
+immediate 21601616
+byte316
+byte416
+byte560
+byte621
+cbjump0compariosn0
+pcnextis 22
+target 0
+pcincr 22
+regoutb 1 
+yellow 0hello 0result to write 0 
+read from reg 0
+14 22
+targetaddress 0
+immediate 17162160
+byte360
+byte421
+byte516
+byte617
+cbjump0compariosn0
+pcnextis 24
+target 0
+pcincr 24
+regoutb 0 
+yellow 0hello 0result to write 0 
+read from reg 0
+15 24
+targetaddress 0
+immediate 21601716
+byte316
+byte417
+byte560
+byte621
+cbjump0compariosn0
+pcnextis 26
+target 0
+pcincr 26
+regoutb 1 
+yellow 0hello 0result to write 0 
+read from reg 0
+16 26
+targetaddress 0
+immediate 18162160
+byte360
+byte421
+byte516
+byte618
+cbjump0compariosn0
+pcnextis 28
+target 0
+pcincr 28
+regoutb 0 
+yellow 0hello 0result to write 0 
+read from reg 0
+17 28
+targetaddress 0
+immediate 21601816
+byte316
+byte418
+byte560
+byte621
+cbjump0compariosn0
+pcnextis 2a
+target 0
+pcincr 2a
+regoutb 1 
+yellow 0hello 0result to write 0 
+read from reg 0
+18 2a
+targetaddress 0
+immediate 19162160
+byte360
+byte421
+byte516
+byte619
+cbjump0compariosn0
+pcnextis 2c
+target 0
+pcincr 2c
+regoutb 0 
+yellow 0hello 0result to write 0 
+read from reg 0
+19 2c
+targetaddress 0
+immediate 21601916
+byte316
+byte419
+byte560
+byte621
+cbjump0compariosn0
+pcnextis 2e
+target 0
+pcincr 2e
+regoutb 1 
+yellow 0hello 0result to write 0 
+read from reg 0
+20 2e
+targetaddress 0
+immediate 162160
+byte360
+byte421
+byte516
+byte60
+cbjump0compariosn0
+pcnextis 30
+target 0
+pcincr 30
+regoutb 0 
+yellow 0hello 0result to write 0 
+read from reg 0
+21 30
+targetaddress 0
+immediate b0016
+byte316
+byte40
+byte5b
+byte60
+cbjump0compariosn0
+pcnextis 32
+target 0
+pcincr 32
+regoutb 1 
+yellow 0hello 0result to write 0 
+read from reg 0
+22 32
+targetaddress 0
+immediate b
+byte3b
+byte40
+byte50
+byte60
+cbjump0compariosn0
+pcnextis 34
+target 0
+pcincr 34
+regoutb 0 
+yellow 0hello 0result to write 0 
+read from reg 0
+23 34
+targetaddress 0
+immediate 0
+byte30
+byte40
+byte50
+byte60
+cbjump0compariosn0
+pcnextis 0
+target 0
+pcincr 36
+regoutb 0 
+yellow 1hello 0result to write 0 
+read from reg 1
+Done

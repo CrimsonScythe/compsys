@@ -8,6 +8,7 @@
 
 void string_stream(const void *arg, FILE *out) {
   fputs((const char*) arg, out);
+  printf("%s", "string stream");
 }
 
 void increment_stream(const void *arg, FILE *out, FILE *in) {
@@ -20,6 +21,8 @@ void increment_stream(const void *arg, FILE *out, FILE *in) {
       break;
     }
   }
+
+  printf("%s", "incrementstream");
 }
 
 void save_stream(void *arg, FILE *in) {
@@ -29,6 +32,8 @@ void save_stream(void *arg, FILE *in) {
   while (fread(d, sizeof(unsigned char), 1, in) == 1) {
     d++; /* Move location ahead by one byte. */
   }
+
+  printf("%s", "savestream");
 }
 
 int main() {

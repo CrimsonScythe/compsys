@@ -1,0 +1,26 @@
+test:
+    movq $5, %rdx 
+    movq $1, %rax
+    cbe $5, %rdx, lar 
+    movq $1, %rax
+lar:
+    cbne $9, %rax, lar2
+    jmp test
+lar2: 
+    cbl $2, %rdx, lar3
+    jmp test
+
+lar3:
+    cble $2, %rdx, lar4
+    jmp test
+lar4:
+    cble $5, %rdx, lar5
+    jmp test
+lar5:
+    cbg $6, %rdx, lar6
+    jmp test
+lar6:
+    cbge $5, %rdx, return
+    jmp test      
+return:
+    ret %r11

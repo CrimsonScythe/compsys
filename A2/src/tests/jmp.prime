@@ -1,0 +1,6 @@
+test:
+    jmp tar
+    movq $2, %rdx
+tar:
+    leaq (%rdi), %rdx
+    ret %r11

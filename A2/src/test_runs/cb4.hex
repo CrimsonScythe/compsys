@@ -1,0 +1,11 @@
+00000000 :                       #  test:
+00000000 : 6460f8ffffff          #      movq $-8, %rdi
+00000006 : 643007000000          #      movq $7, %rdx
+0000000c : 642008000000          #      movq $8, %rcx
+00000012 : 4A631e000000          #      cbb %rdx, %rdi, tar
+00000018 : 4F0000000000          #      jmp test
+0000001e :                       #  tar:
+0000001e : 4B622a000000          #      cbbe %rcx, %rdi, return
+00000024 : 4F0000000000          #      jmp test
+0000002a :                       #  return:
+0000002a : 0000                  #      ret %rax

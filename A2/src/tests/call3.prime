@@ -1,0 +1,7 @@
+test:
+    call tar, %rdx
+    movq $1, %rdi
+    ret %r11     
+tar:
+    movq $5, %rcx
+    

@@ -1,0 +1,9 @@
+test:
+    movq $5, %rdi
+    movq $4, %rdx
+    movq $5, %rcx
+    cbl %rdx,%rcx, target
+    movq $5, %rdx
+target:
+    movq $1, %rdi
+    ret %rax

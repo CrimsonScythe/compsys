@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
     /*** SETUP ***/
     // We set up global state through variables that are preserved between
     // cycles.
-
+    
     // Program counter / Instruction Pointer
     ip_reg_p ip = ip_reg_create();
 
@@ -126,13 +126,19 @@ int main(int argc, char* argv[]) {
         bool is_leaq3        = is(LEAQ3, major_op);
         bool is_leaq6        = is(LEAQ6, major_op);
         bool is_leaq7        = is(LEAQ7, major_op);
-
-       
+        bool is_reg_arith    = is(REG_ARITHMETIC, major_op);
+        bool is_cb           = is(CFLOW, major_op);       
+        bool is_cbi          = is(IMM_CBRANCH, major_op);
+        // target add = minor op if conditional branch statement
+        val comparison = use_if(is_cb || is_cbi, minor_op);
 
         //decode instruction type
         // read minor operation code
-        bool is_imm_arith_sub = is(SUB, minor_op);
-        bool is_imm_arith_add = is(ADD, minor_op);
+        bool is_imm_arith_sub = is_imm_arith && is(SUB, minor_op);
+        bool is_imm_arith_add = is_imm_arith && is(ADD, minor_op);
+        bool is_imm_arith_and = is_imm_arith && is(AND, minor_op);
+        bool is_imm_arith_or  = is_imm_arith && is(OR, minor_op);
+
         // only check for memT and memF if major op code is mem
         bool is_reg_movq_memT = is_reg_movq_mem && is(REG_MOVQ_MT, minor_op);
         bool is_reg_movq_memF = is_reg_movq_mem && is(REG_MOVQ_MF, minor_op);
@@ -148,24 +154,30 @@ int main(int argc, char* argv[]) {
         // bool is_leaq7_z       = is_leaq7 && is(LEAQ7_Z,minor_op);
         bool is_leaq7_add     = is_leaq7 && is(LEAQ7_Z_ADD, minor_op);
 
+        // minor op code for arithemtic operations
+        bool is_reg_arith_add = is_reg_arith && is(ADD, minor_op);
+        bool is_reg_arith_sub = is_reg_arith && is(SUB, minor_op);
+        bool is_reg_arith_and = is_reg_arith && is(AND, minor_op);
+        bool is_reg_arith_or = is_reg_arith && is(OR, minor_op);
+        bool is_reg_arith_xor = is_reg_arith && is(XOR, minor_op);
+        bool is_reg_arith_mul = is_reg_arith && is(MUL, minor_op);
+        bool is_reg_arith_sar = is_reg_arith && is(SAR, minor_op);
+        bool is_reg_arith_sal = is_reg_arith && is(SAL, minor_op);
+        bool is_reg_arith_shr = is_reg_arith && is(SHR, minor_op);
+        bool is_reg_arith_imul = is_reg_arith && is(IMUL, minor_op);
+        bool is_cb_jmp = is_cb && is(JMP, minor_op);
+        bool is_cb_call = is_cb && is(CALL, minor_op);
+        // bool is_cb_e = is_cb && is(E, minor_op);
+
         // determine instruction size
-        bool size2 = is_return || is_reg_movq || is_reg_movq_mem || is_leaq2 || is_leaq3;
-        bool size6 = is_imm_movq || is_imm_arith || is_imm_movq_mem || is_leaq6;   
+        bool size2 = is_return || is_reg_movq || is_reg_movq_mem || is_leaq2 || is_leaq3 || is_reg_arith;
+        bool size6 = is_imm_movq || is_imm_arith || is_imm_movq_mem || is_leaq6 || is_cb;   
         bool size3 = is_leaq3;
         bool size7 = is_leaq7;
+        bool size10 = is_cbi;
 
 
-        val ins_size = 
-        or(
-            or(
-            use_if(size2, from_int(2)),
-            use_if(size6, from_int(6))
-            ) ,
-            or(
-            use_if(size3, from_int(3)),
-            use_if(size7, from_int(7))
-            )
-            );
+        
 
         // printf("%d", is_leaq7_add);
           
@@ -177,7 +189,7 @@ int main(int argc, char* argv[]) {
         // - write is always to reg_d
         bool reg_wr_enable = is_reg_movq || 
         is_imm_movq || is_imm_arith || is_reg_movq_memF || is_imm_movq_memF || 
-        is_leaq2 || is_leaq3 || is_leaq6 || is_leaq7;
+        is_leaq2 || is_leaq3 || is_leaq6 || is_leaq7 || is_reg_arith || is_cb_call;
 
         // Datapath:
         //
@@ -196,8 +208,28 @@ int main(int argc, char* argv[]) {
         val sext_imm_i = or(use_if(!is_leaq7, sign_extend(31, imm_i)),
          use_if(is_leaq7, sign_extend(31, imm_i_3)));
 
-        printf("immediate %x\n", sext_imm_i);
+        val p_tar = or(or(put_bits(0, 8, inst_bytes[6]), put_bits(8,8, inst_bytes[7])),
+                              or(put_bits(16, 8, inst_bytes[8]), put_bits(24,8, inst_bytes[9])));        
 
+        // val target_address = 
+        // or(
+        //     use_if(is_cb, imm_i),
+        //     use_if(is_cbi, reverse_bytes(4, sign_extend(31, imm_i_3)))); 
+
+        val target_address = 
+        or(
+            use_if(is_cb, imm_i),
+            use_if(is_cbi, p_tar)
+            ); 
+
+        printf("targetaddress %x\n", target_address);
+        printf("immediate %x\n", imm_i_3);
+        printf("byte3%lx\n", inst_bytes[3]);
+        printf("byte4%lx\n", inst_bytes[4]);
+        printf("byte5%lx\n", inst_bytes[5]);
+        printf("byte6%lx\n", inst_bytes[6]);
+        
+        
         /*** EXECUTE ***/
         // read registers
         val reg_out_a = reg_read(regs, reg_read_dz); // <-- will generate warning, as we don't use it yet
@@ -208,14 +240,52 @@ int main(int argc, char* argv[]) {
 
         // perform calculations
         // ALU?? 
-        val op_arith = or(use_if(is_imm_arith_sub, alu_execute(from_int(SUB), reg_out_a, op_b)), use_if(is_imm_arith_add, alu_execute(from_int(ADD), reg_out_a, op_b)));
 
+        val op_arith = 
+            or(
+                or(
+                    or( use_if(is_reg_arith_add || is_imm_arith_add, alu_execute(from_int(ADD), reg_out_a, op_b)),
+                        use_if(is_reg_arith_sub || is_imm_arith_sub, alu_execute(from_int(SUB), reg_out_a, op_b))),
+                        
+                    or(use_if(is_reg_arith_and || is_imm_arith_and, alu_execute(from_int(AND), reg_out_a, op_b)),
+                        use_if(is_reg_arith_or || is_imm_arith_or, alu_execute(from_int(OR), reg_out_a, op_b)))
+                ),
+                or(
+                    or(use_if(is_reg_arith_xor, alu_execute(from_int(XOR), reg_out_a, op_b)),
+                    use_if(is_reg_arith_mul, alu_execute(from_int(MUL), reg_out_a, op_b))),
+
+                    or(
+                        or(
+                            use_if(is_reg_arith_sar, alu_execute(from_int(SAR), reg_out_a, op_b)),
+
+                        use_if(is_reg_arith_sal, alu_execute(from_int(SAL), reg_out_a, op_b))
+                        ),
+                        
+                        or (
+                            use_if(is_reg_arith_shr, alu_execute(from_int(SHR), reg_out_a, op_b)),
+                                use_if(is_reg_arith_imul, alu_execute(from_int(IMUL), reg_out_a, op_b))
+                        )
+                        )
+                )
+            );
+
+        
+        // comparator
+        // bool cb_jmp=0;
+        // if (is_cb){
+        bool cb_jmp = (is_cb && comparator(comparison, reg_out_a, reg_out_b))
+        || (is_cbi && comparator(comparison, reg_out_a, sext_imm_i));
+
+        printf("cbjump%d", cb_jmp);
+        
+        printf("compariosn%lx", comparison);
         // not really any calculations yet!
         // generate address for memory access
 
         //bool for checking whether immediate should be used in LEAQ calculation
 
- 
+        // comparator(, reg_out_a, reg_out_b)
+        
         
         // shift amount only if leaq3
         bool is_shift = is_leaq3 || is_leaq7; 
@@ -228,6 +298,7 @@ int main(int argc, char* argv[]) {
         
         
         //test if below works if is_leaq7_add is not added to add_to_shifted
+        
 
         val agen_result = address_generate(reg_wr_agenerate, reg_out_b,
          sext_imm_i, shift_amount,
@@ -236,20 +307,72 @@ int main(int argc, char* argv[]) {
         is_imm_movq_memF || is_imm_movq_memT || is_leaq6 || is_leaq7);   
         // ....
 
+        val ins_size = 
+        or(
+            or(
+                or(
+                    use_if(size2, from_int(2)),
+            use_if(size6, from_int(6))
+                ),
+                use_if(size10, from_int(10))
+            
+            ) ,
+            or(
+            use_if(size3, from_int(3)),
+            use_if(size7, from_int(7))
+            )
+            );
+
         // address of succeeding instruction in memory
-        val pc_incremented  = add(pc, ins_size);
+        // jump if the following minor codes are true
+        bool jmp = is_cb_jmp || cb_jmp || is_cb_call;
+        
+        val pc_incremented =
+        or(
+            use_if(jmp, target_address),
+            use_if(!jmp, add(pc, ins_size))
+        ); 
+        // add(pc, ins_size); 
+        // or(
+        //     use_if(cb_jmp, target_address),
+        //     use_if(!cb_jmp, add(pc, ins_size))
+        // );
+        // add(pc, ins_size);
 
         // printf("%x\n", pc_incremented);
-
+        // printf("lol%d", cb_jmp);
+        // printf("loll%d", is_cb_jmp);
         // determine the next position of the program counter
-        val pc_next = or(use_if(is_return, reg_out_b), use_if(!is_return, pc_incremented));
-        // printf("%x\n", pc_next);
-        /*** MEMORY ***/
 
+
+        val pc_next = or(
+            use_if(is_return, reg_out_b),
+            use_if(!is_return, pc_incremented)
+        );
+
+        // val pc_next = or(
+            
+        //     or(
+        //         use_if(is_cb_jmp, target_address),
+        //         use_if(cb_jmp , target_address)),
+        //     or(
+        //         use_if(is_return, reg_out_b), 
+        //         use_if(!is_return, pc_incremented)
+        //     )
+        //         );
+        printf("\npcnextis %lx", pc_next);
+        printf("\ntarget %lx", target_address);
+        printf("\npcincr %lx", pc_incremented);
+        printf("\nregoutb %lx \n", reg_out_b);
+
+        /*** MEMORY ***/
+        
         // || || etc. below
         bool is_load = is_reg_movq_memF || is_imm_movq_memF;
         // read from memory if needed
         // Not implemented yet!
+        printf("yellow %lx", reg_out_a);
+        printf("hello %lx", agen_result);
         val mem_out = memory_read(mem, agen_result, is_load);
 
         /*** WRITE ***/
@@ -257,17 +380,17 @@ int main(int argc, char* argv[]) {
         //RESULT SELECT
         val datapath_result = or(
             or(
-                use_if(is_imm_arith, op_arith), 
+                use_if(is_imm_arith || is_reg_arith, op_arith), 
                 use_if(is_reg_movq || is_imm_movq , op_b)
             ), 
             or(
-                use_if(is_imm_movq_memF, mem_out),
-                use_if(is_leaq2 || is_leaq3 || is_leaq6 || is_leaq7, agen_result)
+                or(use_if(is_imm_movq_memF || is_reg_movq_memF, mem_out),
+                use_if(is_leaq2 || is_leaq3 || is_leaq6 || is_leaq7, agen_result)),
+                use_if(is_cb_call, add(pc,ins_size))
             ));
-        
+        printf("result to write %lx \n", datapath_result);
 
         // val datapath_result = op_b;
-        printf("result to write %d\n", datapath_result);
         
         // write to register if needed
         reg_write(regs, reg_d, datapath_result, reg_wr_enable);
@@ -276,7 +399,6 @@ int main(int argc, char* argv[]) {
         bool is_store = is_reg_movq_memT || is_imm_movq_memT;
         // Not implemented yet!
         memory_write(mem, agen_result, reg_out_a, is_store);
-
         // update program counter
         ip_write(ip, pc_next, true);
         // printf("is %ld", pc_next.val);
