@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include<sys/wait.h>
 struct stream {
   int hasReader;
   FILE* file;
@@ -13,11 +13,7 @@ struct stream {
 void transducers_free_stream(stream *s) {
   // A stream
 // may only be freed once the transducer tree in which it is used has finished
-  //fclose
-  // if (s->hasReader == 1){
-  //   exit(0);
-  // }
-
+  
   fclose(s->file);
   free(s);
 }
@@ -78,7 +74,10 @@ int transducers_link_sink(transducers_sink s, void *arg,
                           stream *in) {
     
   // hasreader check
-  assert(in->hasReader == 0);
+  if (in->hasReader != 0){
+    exit(1);
+  }
+  
   in->hasReader=1;
   s(arg,in->file);    
   
@@ -90,13 +89,6 @@ int transducers_link_1(stream **out,
                        transducers_1 t, const void *arg,
                        stream* in) {
 
-  // assert(transducers_link_1(&s[1], increment_stream, &inc, s[0]) == 0);
-  // stream* s[2]
-  // out  = &s[1]
-  // t = increment_stream()
-  // arg = &inc
-  // in = s[0]
-  
   assert(in->hasReader == 0);
   FILE* files[2];
   file_pipe(files);
@@ -104,6 +96,8 @@ int transducers_link_1(stream **out,
   {
     fclose(files[0]);
     in->hasReader = 1;
+        // printf("%s", "foked");    
+
     t(arg, files[1], in->file);
     exit(0);
   }
@@ -122,35 +116,64 @@ int transducers_link_1(stream **out,
 int transducers_link_2(stream **out,
                        transducers_2 t, const void *arg,
                        stream* in1, stream* in2) {
-  //out=out; /* unused */
-  //t=t; /* unused */
-  //arg=arg; /* unused */
-  //in1=in1; /* unused */
-  //in2=in2; /* unused */
   
   FILE* files[2];
   file_pipe(files);
 
   if (fork() == 0)
   {
+   
     fclose(files[0]);
-    // in->hasReader = 1;
+ 
     t(arg, files[1], in1->file, in2->file);
     exit(0);
   }
   else {
 
     fclose(files[1]);  
-    *out = malloc(sizeof(files));
+    *out = malloc(sizeof(stream));
     (*out)->file = files[0];
+
   }
+
   return 0;
 }
 
 int transducers_dup(stream **out1, stream **out2,
                     stream *in) {
-  out1=out1; /* unused */
-  out2=out2; /* unused */
-  in=in; /* unused */
-  return 1;
-}
+//   out1=out1; /* unused */
+//   out2=out2; /* unused */
+//   in=in; /* unused */
+//   return 1;
+  FILE* files[2];
+  file_pipe(files);
+  FILE* filez[2];
+  file_pipe(filez);
+  unsigned char c;
+
+  if (fork() == 0)
+  {
+    fclose(files[0]);
+    fclose(filez[0]);
+
+    while (fread(&c, sizeof(unsigned char), 1, in -> file) == 1) {
+      (fwrite(&c, sizeof(unsigned char), 1, files[1]) == 1); 
+      (fwrite(&c, sizeof(unsigned char), 1, filez[1]) != 1);
+    } 
+    exit(0);
+  } 
+
+  else {
+
+    fclose(files[1]);
+    fclose(filez[1]);  
+    *out1 = malloc(sizeof(stream));
+    (*out1)->file = files[0];
+    *out2 = malloc(sizeof(stream));
+    (*out2)->file = filez[0];
+
+  }
+
+
+  return 0;
+ }
