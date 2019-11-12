@@ -41,22 +41,17 @@ int transducers_link_source(stream **out,
   file_pipe(files);
 
   if(fork() == 0){
-    // read
-          // printf("%s", "child");     
-          fclose(files[0]);    
-        
-        s(arg, files[1]);
-        exit(0); 
+    
+    fclose(files[0]);    
+    s(arg, files[1]);
+    exit(0); 
       
 
   } else {
-    //  printf("%s", "parent");  
-    //write
-    //close other pipe end here
 
     fclose(files[1]);
-     *out = malloc(sizeof(stream));
-     (*out)->hasReader = 0;
+    *out = malloc(sizeof(stream));
+    (*out)->hasReader = 0;
     (*out)->file = files[0];
 
   }
@@ -75,7 +70,7 @@ int transducers_link_sink(transducers_sink s, void *arg,
     
   // hasreader check
   if (in->hasReader != 0){
-    exit(1);
+    return 1;
   }
   
   in->hasReader=1;
@@ -89,15 +84,20 @@ int transducers_link_1(stream **out,
                        transducers_1 t, const void *arg,
                        stream* in) {
 
-  assert(in->hasReader == 0);
+ 
+    if (in->hasReader == 1)
+    {
+      return 1;
+    } else {
+      in->hasReader=1;
+    }
+    
+  
   FILE* files[2];
   file_pipe(files);
   if (fork() == 0)
   {
     fclose(files[0]);
-    in->hasReader = 1;
-        // printf("%s", "foked");    
-
     t(arg, files[1], in->file);
     exit(0);
   }
@@ -141,38 +141,110 @@ int transducers_link_2(stream **out,
 
 int transducers_dup(stream **out1, stream **out2,
                     stream *in) {
-//   out1=out1; /* unused */
-//   out2=out2; /* unused */
-//   in=in; /* unused */
-//   return 1;
+ 
   FILE* files[2];
   file_pipe(files);
+
   FILE* filez[2];
   file_pipe(filez);
+
   unsigned char c;
+  unsigned char d;
 
-  if (fork() == 0)
-  {
+  int t;
+
+  FILE* fil1;
+
+  fil1 = fdopen(t, "w");
+
+  
+
+    if (fork() == 0)
+    {
     fclose(files[0]);
-    fclose(filez[0]);
+      *out1 = malloc(sizeof(stream));
 
-    while (fread(&c, sizeof(unsigned char), 1, in -> file) == 1) {
-      (fwrite(&c, sizeof(unsigned char), 1, files[1]) == 1); 
-      (fwrite(&c, sizeof(unsigned char), 1, filez[1]) != 1);
-    } 
+    while (fread(&c, sizeof(unsigned char), 1, in->file)==1){
+      // printf("%c", c);
+      fwrite(&c, sizeof(unsigned char), 1, files[1]); 
+      fwrite(&c, sizeof(unsigned char), 1, fil1);
+    }
+
     exit(0);
-  } 
 
-  else {
-
+  } else {
     fclose(files[1]);
-    fclose(filez[1]);  
-    *out1 = malloc(sizeof(stream));
-    (*out1)->file = files[0];
-    *out2 = malloc(sizeof(stream));
-    (*out2)->file = filez[0];
 
+    *out2 = malloc(sizeof(stream));
+    // fwrite(files[0], sizeof(unsigned char), 1, &((*out2)->file));
+    (*out2)->file = files[0];
+  
   }
+
+  // if (fork() == 0)
+  // {
+  //   fclose(files[0]);
+
+  //   while (fread(&c, sizeof(unsigned char), 1, in->file)==1){
+  //     // printf("%c", c);
+  //     fwrite(&c, sizeof(unsigned char), 1, files[1]); 
+  //     fwrite(&c, sizeof(unsigned char), 1, (*out1)->file); 
+  //   }
+
+  //   exit(0);
+
+  // } else {
+  //   fclose(files[1]);
+  //   *out2 = malloc(sizeof(stream));
+  //   (*out2)->file = files[0];
+  //   // *out1 = malloc(sizeof(stream));
+  //   // FILE* fil = files[0];
+  //   // (*out1)->file = fil;    
+  // }
+  
+
+  // if (fork() == 0)
+  // {
+  //   fclose(files[0]);
+
+  //   while (fread(&c, sizeof(unsigned char), 1, in->file)==1){
+  //     // printf("%c", c);
+  //     fwrite(&c, sizeof(unsigned char), 1, files[1]); 
+  //   }
+
+  //   exit(0);
+
+  // } else {
+  //   fclose(files[1]);
+
+  //   *out2 = malloc(sizeof(stream));
+  //   (*out2)->file = files[0];    
+
+
+  //   if (fork() == 0)
+  //   {
+  //     fclose(filez[0]);
+
+  //     while (fread(&d, sizeof(unsigned char), 1, (*out2)->file)==1){
+  //     printf("%c", d);
+  //     fwrite(&d, sizeof(unsigned char), 1, filez[1]); 
+  //     }
+
+  //   exit(0);
+
+  //   } else {
+
+  //     fclose(filez[1]);
+
+  //     *out1 = malloc(sizeof(stream));
+  //     (*out1)->file = filez[0];    
+
+  //   }
+    
+
+  // }
+  
+
 
 
   return 0;

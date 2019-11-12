@@ -23,7 +23,7 @@ void transducer_link2_func(const void *arg, FILE *out, FILE *in1, FILE *in2) {
       {
         break;
       }
-      // printf("%c, %c", c, d);
+   
       if ((c==d) && (count < num_elems))
       {
         fwrite(&c, sizeof(unsigned char), 1, out);
@@ -31,10 +31,7 @@ void transducer_link2_func(const void *arg, FILE *out, FILE *in1, FILE *in2) {
       }
       
     }
-    
-
-  // printf("%d", count);
- 
+   
         
 }
 
@@ -86,9 +83,8 @@ int main() {
   
   assert(transducers_link_sink(save_stream, output, s[2]) == 0);
 
-  // printf("%s", output);
   
-    assert(strcmp(output, "Hello")==0);
+  assert(strcmp(output, "Hello")==0);
 
   /* Note the sizeof()-trick to determine the number of elements in
      the array.  This *only* works for statically allocated arrays,
