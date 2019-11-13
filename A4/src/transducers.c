@@ -149,103 +149,28 @@ int transducers_dup(stream **out1, stream **out2,
   file_pipe(filez);
 
   unsigned char c;
-  unsigned char d;
 
-  int t;
-
-  FILE* fil1;
-
-  fil1 = fdopen(t, "w");
-
-  
-
-    if (fork() == 0)
-    {
+    if (fork() == 0) {
     fclose(files[0]);
-      *out1 = malloc(sizeof(stream));
+    fclose(filez[0]);
 
     while (fread(&c, sizeof(unsigned char), 1, in->file)==1){
-      // printf("%c", c);
       fwrite(&c, sizeof(unsigned char), 1, files[1]); 
-      fwrite(&c, sizeof(unsigned char), 1, fil1);
+      fwrite(&c, sizeof(unsigned char), 1, filez[1]);
     }
 
     exit(0);
-
-  } else {
-    fclose(files[1]);
-
-    *out2 = malloc(sizeof(stream));
-    // fwrite(files[0], sizeof(unsigned char), 1, &((*out2)->file));
-    (*out2)->file = files[0];
-  
-  }
-
-  // if (fork() == 0)
-  // {
-  //   fclose(files[0]);
-
-  //   while (fread(&c, sizeof(unsigned char), 1, in->file)==1){
-  //     // printf("%c", c);
-  //     fwrite(&c, sizeof(unsigned char), 1, files[1]); 
-  //     fwrite(&c, sizeof(unsigned char), 1, (*out1)->file); 
-  //   }
-
-  //   exit(0);
-
-  // } else {
-  //   fclose(files[1]);
-  //   *out2 = malloc(sizeof(stream));
-  //   (*out2)->file = files[0];
-  //   // *out1 = malloc(sizeof(stream));
-  //   // FILE* fil = files[0];
-  //   // (*out1)->file = fil;    
-  // }
-  
-
-  // if (fork() == 0)
-  // {
-  //   fclose(files[0]);
-
-  //   while (fread(&c, sizeof(unsigned char), 1, in->file)==1){
-  //     // printf("%c", c);
-  //     fwrite(&c, sizeof(unsigned char), 1, files[1]); 
-  //   }
-
-  //   exit(0);
-
-  // } else {
-  //   fclose(files[1]);
-
-  //   *out2 = malloc(sizeof(stream));
-  //   (*out2)->file = files[0];    
-
-
-  //   if (fork() == 0)
-  //   {
-  //     fclose(filez[0]);
-
-  //     while (fread(&d, sizeof(unsigned char), 1, (*out2)->file)==1){
-  //     printf("%c", d);
-  //     fwrite(&d, sizeof(unsigned char), 1, filez[1]); 
-  //     }
-
-  //   exit(0);
-
-  //   } else {
-
-  //     fclose(filez[1]);
-
-  //     *out1 = malloc(sizeof(stream));
-  //     (*out1)->file = filez[0];    
-
-  //   }
     
+    } else {
+    fclose(files[1]);
+    fclose(filez[1]);
 
-  // }
-  
+      *out2 = malloc(sizeof(stream));
+      (*out2)->file = filez[0];     
 
-
+      *out1 = malloc(sizeof(stream));
+      (*out1)->file = files[0];       
+    }
 
   return 0;
  }

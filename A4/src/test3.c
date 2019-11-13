@@ -43,23 +43,20 @@ int main() {
   output2[strlen(input1)] = '\0'; /* Ensure terminating NULL. */
   
   
-//create the stream that gets duplicated
   assert(transducers_link_source(&s[0], string_stream, input1) == 0);
   
-//duplicate stream
   assert(transducers_dup(&s[2], &s[1], s[0]) == 0);
 
-  // assert(transducers_link_sink(save_stream, output2, s[2]) == 0);
-  // printf("output2: %s\n", output2);
+  assert(transducers_link_sink(save_stream, output2, s[2]) == 0);
+  printf("output2: %s\n", output2);
 
-
-
-    assert(transducers_link_sink(save_stream, output1, s[1]) == 0);
+  assert(transducers_link_sink(save_stream, output1, s[1]) == 0);
   printf("output1: %s\n", output1);
-  
+
+  assert(strcmp(output1, input1)==0);
+  assert(strcmp(output2, input1)==0);
 
 
-  
   // free(output0);
   // free(output1);
   // free(output2);
