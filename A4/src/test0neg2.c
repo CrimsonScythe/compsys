@@ -31,9 +31,8 @@ int main() {
   output[strlen(input)] = '\0'; /* Ensure terminating NULL. */
 
   assert(transducers_link_source(&s[0], string_stream, input) == 0);
+  assert(transducers_link_source(&s[0], string_stream, input) == 0);
   assert(transducers_link_sink(save_stream, output, s[0]) == 0);
-  assert(transducers_link_sink(save_stream, output, s[0]) != 0);
-  
   
   /* We cannot use the '==' operator for comparing strings, as strings
      in C are just pointers.  Using '==' would compare the _addresses_

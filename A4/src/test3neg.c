@@ -32,7 +32,6 @@ int main() {
   stream* s[3];
 
   char *input1 = "Hello, World!";
-  
 
 
   char *output1 = malloc(strlen(input1)+1);
@@ -45,6 +44,7 @@ int main() {
   assert(transducers_link_source(&s[0], string_stream, input1) == 0);
   
   assert(transducers_dup(&s[2], &s[1], s[0]) == 0);
+  assert(transducers_dup(&s[2], &s[1], s[0]) != 0);
 
   assert(transducers_link_sink(save_stream, output2, s[2]) == 0);
   printf("output2: %s\n", output2);
@@ -55,10 +55,9 @@ int main() {
   assert(strcmp(output1, input1)==0);
   assert(strcmp(output2, input1)==0);
 
-  for (int i = 0; i < (int)(sizeof(s)/sizeof(s[0])); i++) {
+for (int i = 0; i < (int)(sizeof(s)/sizeof(s[0])); i++) {
     transducers_free_stream(s[i]);
   }
-
 
   free(output1);
   free(output2);

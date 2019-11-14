@@ -80,7 +80,8 @@ int main() {
   assert(transducers_link_source(&s[1], string_stream, input2) == 0);
 
   assert(transducers_link_2(&s[2], transducer_link2_func, &count, s[0], s[1]) == 0);
-  
+  assert(transducers_link_2(&s[2], transducer_link2_func, &count, s[0], s[1]) != 0);
+
   assert(transducers_link_sink(save_stream, output, s[2]) == 0);
 
   
@@ -92,7 +93,7 @@ int main() {
   for (int i = 0; i < (int)(sizeof(s)/sizeof(s[0])); i++) {
     transducers_free_stream(s[i]);
   }
-  
+
 
   free(output);
 

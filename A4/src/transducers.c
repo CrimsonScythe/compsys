@@ -30,7 +30,7 @@ static int file_pipe(FILE* files[2]) {
       return 1;
     }
   } else {
-    return r;
+    return r; 
   }
 }
 
@@ -76,7 +76,6 @@ int transducers_link_sink(transducers_sink s, void *arg,
   in->hasReader=1;
   s(arg,in->file);    
   
-
   return 0;
 }
 
@@ -116,7 +115,16 @@ int transducers_link_1(stream **out,
 int transducers_link_2(stream **out,
                        transducers_2 t, const void *arg,
                        stream* in1, stream* in2) {
+
+  if (in1->hasReader == 1 || in2->hasReader == 1)
+  {
+    return 1;
+  } else{
+    in1->hasReader=1;
+    in2->hasReader=1;
+  }
   
+
   FILE* files[2];
   file_pipe(files);
 
@@ -124,7 +132,7 @@ int transducers_link_2(stream **out,
   {
    
     fclose(files[0]);
- 
+
     t(arg, files[1], in1->file, in2->file);
     exit(0);
   }
@@ -142,6 +150,15 @@ int transducers_link_2(stream **out,
 int transducers_dup(stream **out1, stream **out2,
                     stream *in) {
  
+  if (in->hasReader == 1)
+  {
+    return 1;
+    
+  } else {
+    in->hasReader = 1;
+  }
+  
+
   FILE* files[2];
   file_pipe(files);
 
