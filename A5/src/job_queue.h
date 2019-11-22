@@ -5,7 +5,7 @@
 
 
 struct job_queue {
-  int* data;
+  void** data;
   int front;
   int end;
   int capacity;

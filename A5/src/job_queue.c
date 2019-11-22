@@ -10,6 +10,7 @@ pthread_mutex_t push_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t push_cond = PTHREAD_COND_INITIALIZER;
 
 int job_queue_init(struct job_queue *job_queue, int capacity) {
+  // job_queue->data = malloc(sizeof(void) * capacity);
   job_queue->data = malloc(sizeof(int) * capacity);
   job_queue->front = 0;
   job_queue->end = 0;
@@ -22,7 +23,12 @@ int job_queue_init(struct job_queue *job_queue, int capacity) {
 }
 
 int job_queue_destroy(struct job_queue *job_queue) {
-  assert(0);
+  // while (job_queue->isEmpty==0)
+  // {
+    // pthread_cond_wait()
+  // }
+  
+  return(0);
 }
 
 int job_queue_push(struct job_queue *job_queue, void* data) {
@@ -32,8 +38,8 @@ int job_queue_push(struct job_queue *job_queue, void* data) {
   while (job_queue->isFull==1) {
     pthread_cond_wait(&push_cond, &push_mutex);
   }
-  
-  job_queue->data[job_queue->front] = *((int*)data); 
+  // printf();
+  job_queue->data[job_queue->front] = *(data); 
   job_queue->front = (job_queue->front+1) % job_queue->capacity;
   job_queue->filling++;
   if (job_queue->filling != 0) {
@@ -58,7 +64,7 @@ int job_queue_pop(struct job_queue *job_queue, void **data) {
   }
   
   // sleep(5);
-  *((int**)data) = malloc(sizeof(int*)); 
+  *((int**)data) = malloc(sizeof(int)); 
   **((int**)data) = job_queue->data[job_queue->end];
   job_queue->filling--;
   if (job_queue->filling == 0){
