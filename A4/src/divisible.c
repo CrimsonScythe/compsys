@@ -2,7 +2,6 @@
    given numbers and print them to the screen. */
 
 #include "transducers.h"
-
 #include <stdio.h>
 #include <unistd.h>
 #include <assert.h>
@@ -19,7 +18,6 @@ void random_garbage(const void *arg, FILE *out) {
 
 void divisible_by(const void *arg, FILE *out, FILE *in) {
   int d = *(int*)arg;
-
   int x;
   while (fread(&x, sizeof(int), 1, in) == 1) {
     int y = (x % d) == 0;
@@ -52,7 +50,7 @@ void print_stream(void *arg, FILE *in) {
   arg=arg; // Unused
   int x;
   while (fread(&x, sizeof(int), 1, in) == 1) {
-    printf("%d\n", x);
+    printf("%d \n", x);
   }
 }
 

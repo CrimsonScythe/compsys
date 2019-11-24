@@ -1,4 +1,4 @@
-TESTS=test0 test0neg test1 test2 test3 test1neg test2neg test3neg test0neg2
+TESTS=test0 test0neg test1 test2 test3 test1neg test2neg test3neg
 EXAMPLES=divisible
 
 CC=gcc

@@ -7,13 +7,11 @@
 #include <string.h>
 
 void string_stream(const void *arg, FILE *out) {
- printf("%s", "stream\n");
   fputs((const char*) arg, out);
 
 }
 
 void save_stream(void *arg, FILE *in) {
-  printf("%s", "save\n");
   /* We will be writing bytes to this location. */
   unsigned char *d = arg;
 // printf("%s", "l");
@@ -25,7 +23,6 @@ void save_stream(void *arg, FILE *in) {
 
 int main() {
   stream* s[1];
-
   char *input = "Hello, World!";
   char *output = malloc(strlen(input)+1);
   output[strlen(input)] = '\0'; /* Ensure terminating NULL. */
@@ -36,11 +33,13 @@ int main() {
   /* We cannot use the '==' operator for comparing strings, as strings
      in C are just pointers.  Using '==' would compare the _addresses_
      of the two strings, which is not what we want. */
+
   assert(strcmp(input,output) == 0);
 
   /* Note the sizeof()-trick to determine the number of elements in
      the array.  This *only* works for statically allocated arrays,
      *not* ones created by malloc(). */
+
   for (int i = 0; i < (int)(sizeof(s)/sizeof(s[0])); i++) {
     transducers_free_stream(s[i]);
   }

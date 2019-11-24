@@ -1,5 +1,4 @@
 #include "transducers.h"
-
 #include <stdio.h>
 #include <unistd.h>
 #include <assert.h>
@@ -8,21 +7,17 @@
 
 void string_stream(const void *arg, FILE *out) {
   fputs((const char*) arg, out);
-  printf("%s", "string stream");
 }
 
 void increment_stream(const void *arg, FILE *out, FILE *in) {
-  // int d = *(int*)arg;
-
-  // unsigned char c;
-  // while (fread(&c, sizeof(unsigned char), 1, in) == 1) {
-  //   c += d;
-  //   if (fwrite(&c, sizeof(unsigned char), 1, out) != 1) {
-  //     break;
-  //   }
-  // }
-
-  // printf("%s", "incrementstream");
+    int d = *(int*)arg;
+    unsigned char c;
+    while (fread(&c, sizeof(unsigned char), 1, in) == 1) {
+      c += d;
+    if (fwrite(&c, sizeof(unsigned char), 1, out) != 1) {
+      break;
+    }
+  }
 }
 
 void save_stream(void *arg, FILE *in) {
@@ -32,8 +27,6 @@ void save_stream(void *arg, FILE *in) {
   while (fread(d, sizeof(unsigned char), 1, in) == 1) {
     d++; /* Move location ahead by one byte. */
   }
-
-  printf("%s", "savestream");
 }
 
 int main() {
@@ -60,11 +53,6 @@ int main() {
   for (int i = 0; i < (int)(sizeof(s)/sizeof(s[0])); i++) {
     transducers_free_stream(s[i]);
   }
-  TODO:
-  //remember to call freestream
-  //check memory leakage
-  
   free(output);
-
   return 0;
 }
