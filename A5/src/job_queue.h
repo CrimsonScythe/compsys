@@ -12,6 +12,7 @@ struct job_queue {
   int isEmpty;
   int isFull;
   int filling;
+  int destroyed;
 };
 
 // Initialise a job queue with the given capacity.  The queue starts out
