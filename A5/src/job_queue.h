@@ -13,6 +13,16 @@ struct job_queue {
   int isFull;
   int filling;
   int destroyed;
+
+//   pthread_mutex_t q_mutex;
+//   pthread_cond_t pop_cond;
+
+// // pthread_mutex_t push_mutex = PTHREAD_MUTEX_INITIALIZER;
+//   pthread_cond_t push_cond;
+
+// //pthread_mutex_t destroy_mutex = PTHREAD_MUTEX_INITIALIZER;
+//   pthread_cond_t destroy_cond;
+
 };
 
 // Initialise a job queue with the given capacity.  The queue starts out

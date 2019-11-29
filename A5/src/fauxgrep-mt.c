@@ -106,9 +106,8 @@ int main(int argc, char * const *argv) {
     paths = &argv[2];
   }
 
-  //TODO change 6
   struct job_queue jq;
-  job_queue_init(&jq, 6);
+  assert(job_queue_init(&jq, 64)==0);
 
   pthread_t *threads = calloc(num_threads, sizeof(pthread_t));
   for (int i = 0; i < num_threads; i++) {
@@ -138,17 +137,14 @@ int main(int argc, char * const *argv) {
     case FTS_D:
       break;
     case FTS_F:
-      job_queue_push(&jq, strdup(p->fts_path));
-      //TODO remember assert
-      // assert(0); // Process the file p->fts_path, somehow.
+      assert(job_queue_push(&jq, strdup(p->fts_path))== 0);
+       // Process the file p->fts_path, somehow.
       break;
     default:
       break;
     }
   }
-  
-  //TODO free after strdup
-  // free(p->fts_path);
+
 
   fts_close(ftsp);
   job_queue_destroy(&jq);  

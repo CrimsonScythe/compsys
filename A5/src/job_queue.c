@@ -7,14 +7,15 @@
 //TODO remember to undo changes to fibs size etc.
 //TODO make terminal exit when piping, probably something wrong with pop
 
-pthread_mutex_t q_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t pop_cond = PTHREAD_COND_INITIALIZER;
+
+  pthread_mutex_t q_mutex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_cond_t pop_cond = PTHREAD_COND_INITIALIZER;
 
 // pthread_mutex_t push_mutex = PTHREAD_MUTEX_INITIALIZER;
- pthread_cond_t push_cond = PTHREAD_COND_INITIALIZER;
+  pthread_cond_t push_cond = PTHREAD_COND_INITIALIZER;
 
 //pthread_mutex_t destroy_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t destroy_cond = PTHREAD_COND_INITIALIZER;
+  pthread_cond_t destroy_cond = PTHREAD_COND_INITIALIZER;
 
 int job_queue_init(struct job_queue *job_queue, int capacity) {
 
@@ -47,14 +48,16 @@ int job_queue_destroy(struct job_queue *job_queue) {
   {
     pthread_cond_wait(&destroy_cond, &q_mutex);
   }
-
+  // needed to wake up pops
+  job_queue->isEmpty = 0;
   job_queue->destroyed = 1;
-  pthread_cond_signal(&pop_cond);
-
+  
+  // used broadcast to signal to all sleeping pop threads
+  pthread_cond_broadcast(&pop_cond);
   //prevent pushes????
 
   assert(pthread_mutex_unlock(&q_mutex)==0);
-  
+
   return(0);
 }
 
@@ -80,6 +83,7 @@ int job_queue_push(struct job_queue *job_queue, void* data) {
   }
   
   // only send signal if isempty??
+  //TODO assert signal? 
   pthread_cond_signal(&pop_cond);
   assert(pthread_mutex_unlock(&q_mutex)==0);
   return(0);
@@ -93,7 +97,10 @@ int job_queue_pop(struct job_queue *job_queue, void **data) {
 
   if (job_queue->destroyed==1)
   {
-    return 1;
+    // mutex must be unlocked here, otherwise other threads woken up
+    // will not be able to enter the code block
+    assert(pthread_mutex_unlock(&q_mutex)==0);
+    return -1;
   }
   
   *data = job_queue->data[job_queue->end];

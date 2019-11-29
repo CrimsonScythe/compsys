@@ -37,7 +37,7 @@ int fhistogram(char const *path) {
   while (fread(&c, sizeof(c), 1, f) == 1) {
     i++;
     update_histogram(local_histogram, c);
-    if ((i % 100000) == 0) {
+    if ((i % 100) == 0) {
       merge_histogram(local_histogram, global_histogram);
       print_histogram(global_histogram);
     }
