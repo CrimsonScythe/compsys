@@ -44,9 +44,8 @@ int fhistogram(char const *path) {
   while (fread(&c, sizeof(c), 1, f) == 1) {
     i++;
     update_histogram(local_histogram, c);
-    if ((i % 1) == 0) {
+    if ((i % 100) == 0) {
 
-      // pthread_mutex_lock(&stdout_mutex);
       merge_histogram(local_histogram, global_histogram);
       print_histogram(global_histogram);    
     }
@@ -115,7 +114,7 @@ int main(int argc, char * const *argv) {
   }
 
   struct job_queue jq;
-  job_queue_init(&jq, 64);
+  assert(job_queue_init(&jq, 64)==0);
 
   pthread_t *threads = calloc(num_threads, sizeof(pthread_t));
   for (int i = 0; i < num_threads; i++) {
@@ -123,8 +122,6 @@ int main(int argc, char * const *argv) {
       err(1, "pthread_create() failed");
     }
   } 
-
-  //assert(0); // Initialise the job queue and some worker threads here.
 
   // FTS_LOGICAL = follow symbolic links
   // FTS_NOCHDIR = do not change the working directory of the process
@@ -145,7 +142,7 @@ int main(int argc, char * const *argv) {
     case FTS_D:
       break;
     case FTS_F:
-      job_queue_push(&jq, strdup(p->fts_path));
+      assert(job_queue_push(&jq, strdup(p->fts_path))==0);
       break;
     default:
       break;
@@ -156,7 +153,7 @@ int main(int argc, char * const *argv) {
 
   
 
-  job_queue_destroy(&jq);  
+  assert(job_queue_destroy(&jq)== 0);  
 
   for (int i = 0; i < num_threads; i++) {
     if (pthread_join(threads[i], NULL) != 0) {
@@ -165,8 +162,6 @@ int main(int argc, char * const *argv) {
   }
 
   move_lines(9);
-  //assert(0); // Shut down the job queue and the worker threads here.
-
 
   return 0;
 }

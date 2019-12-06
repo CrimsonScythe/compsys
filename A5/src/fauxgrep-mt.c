@@ -21,6 +21,8 @@
 char const *needle;
 char * const *paths;
 
+pthread_mutex_t stdout_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 int fauxgrep_file(char const *needle, char const *path) {
   FILE *f = fopen(path, "r");
 
@@ -34,10 +36,11 @@ int fauxgrep_file(char const *needle, char const *path) {
   int lineno = 1;
 
   while (getline(&line, &linelen, f) != -1) {
+    assert(pthread_mutex_lock(&stdout_mutex)==0);
     if (strstr(line, needle) != NULL) {
       printf("%s:%d: %s", path, lineno, line);
     }
-
+    assert(pthread_mutex_unlock(&stdout_mutex)==0);
     lineno++;
   }
 
@@ -81,9 +84,6 @@ int main(int argc, char * const *argv) {
   int num_threads = 1;
   needle = argv[1];
   paths = &argv[2];
-  // char const *needle = argv[1];
-  // char * const *paths = &argv[2];
-  
 
   if (argc > 3 && strcmp(argv[1], "-n") == 0) {
     // Since atoi() simply returns zero on syntax errors, we cannot
@@ -115,9 +115,7 @@ int main(int argc, char * const *argv) {
       err(1, "pthread_create() failed");
     }
   }
-  //TODO remember to assert here
-   // Initialise the job queue and some worker threads here.
-
+ 
   // FTS_LOGICAL = follow symbolic links
   // FTS_NOCHDIR = do not change the working directory of the process
   //
@@ -138,7 +136,6 @@ int main(int argc, char * const *argv) {
       break;
     case FTS_F:
       assert(job_queue_push(&jq, strdup(p->fts_path))== 0);
-       // Process the file p->fts_path, somehow.
       break;
     default:
       break;
@@ -147,15 +144,13 @@ int main(int argc, char * const *argv) {
 
 
   fts_close(ftsp);
-  job_queue_destroy(&jq);  
-
+  assert(job_queue_destroy(&jq)==0);  
+  
   for (int i = 0; i < num_threads; i++) {
     if (pthread_join(threads[i], NULL) != 0) {
       err(1, "pthread_join() failed");
     }
   }
 
-  // TODO remember assert
-   // Shut down the job queue and the worker threads here.
   return(0);
 }
