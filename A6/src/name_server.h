@@ -5,6 +5,7 @@
 #define MAX_USERS   16
 
 typedef struct client_t {
+  
   /*
    * template for a struct which can be
    * used to represent a connected client.
@@ -14,7 +15,10 @@ typedef struct client_t {
    * find necessary to maintain across a user session.
    *
    */
-
+  char* usernameAndPassword;
+  char* port;
+  char* ip;
+  
   int conn_socket;
 
 } client_t;

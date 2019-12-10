@@ -3,11 +3,14 @@
 char name_server_ip[IP_LEN];       // hostname and port of name server - these
 char name_server_port[PORT_LEN];   // are passed as command line arguments.
 int  name_server_socket = -1;      // socket to the name server. initialized to -1.
+char buf[MAXLINE];
 
 char my_ip[IP_LEN];                // my_ip and my_port are set on /login, and are used for listening.
 char my_port[PORT_LEN];
 
 char my_username[USERNAME_LEN];
+
+char usernameAndPassword[MAXLINE];
 
 int logged_in = 0;
 
@@ -36,7 +39,8 @@ int main(int argc, char **argv) {
    * HINT: use the specified ip and port to setup a socket to the name server.
    * HINT: remember that you are free to use everything from csapp.c.
    */
-   name_server_socket = open_clientfd(name_server_ip, name_server_port);
+  // Open_clientfd
+   name_server_socket = Open_clientfd(name_server_ip, name_server_port);
   /*
    * we use the RIO library from csapp.c to read user input line by line.
    */
@@ -51,6 +55,10 @@ int main(int argc, char **argv) {
   char *username, *password;  // these pointers will serve different
   char *ip, *port;            // purposes based on the current command.
   char *message;
+
+  //TODO move this in worker thread later
+  char buf2[MAXLINE];
+  rio_t rio2;
 
   int running = 1;
   while (running) {
@@ -70,6 +78,11 @@ int main(int argc, char **argv) {
     switch (command) {
 
       case LOGIN:
+
+        
+        
+        Rio_readinitb(&rio2, name_server_socket);
+
         if (logged_in) {
           printf(">> /login error: already logged in as %s\n", my_username);
           break;
@@ -83,12 +96,13 @@ int main(int argc, char **argv) {
         snprintf(my_ip,   IP_LEN,   ip);   // write ip and port to my_ip and my_port
         snprintf(my_port, PORT_LEN, port);
 
+        char LOGIN_REQUEST[] = "LOGIN"; 
+
         /*
          * TODO #2
          * TODO: LOG INTO NAME SERVER HERE.
          * HINT: use the established connection to the
          * HINT: name server to send a login request
-         *
          * HINT: write to the name_server_socket set up earlier; recall that a
          * HINT: socket is functionally similar to a file descriptor, and
          * HINT: is written to similarly. you can for example use the RIO library,
@@ -97,9 +111,31 @@ int main(int argc, char **argv) {
          * HINT: eventually, you want to set logged_in to 1, but depending
          * HINT: on your protocol, you may want to somehow confirm the login first :)
          */
-        // logged_in = 1;
-        break;
+        // logged_in = 1; 
+            
+        Rio_writen(name_server_socket, LOGIN_REQUEST, strlen(LOGIN_REQUEST));   
+        Rio_writen(name_server_socket, "\n", 1);
+        Rio_writen(name_server_socket, username, strlen(username));
+        Rio_writen(name_server_socket, password, strlen(password));
+        Rio_writen(name_server_socket, "\n", 1);
+        Rio_writen(name_server_socket, my_port, PORT_LEN);
+        Rio_writen(name_server_socket, "\n", 1);
+        Rio_writen(name_server_socket, my_ip, IP_LEN);
+        Rio_writen(name_server_socket, "\n", 1);  
 
+        size_t n;
+
+
+        while (1) {
+          n=Rio_readlineb(&rio2, buf2,MAXLINE);
+          if (n>0) {
+            Fputs(buf2, stdout);
+            break;
+          }
+        }
+        
+
+        break;
 
       case LOOKUP:
         if (!logged_in) {
@@ -180,6 +216,7 @@ int main(int argc, char **argv) {
         printf(">> Error: unknown command or wrong number of arguments.\n");
         break;
     }
+    // running=0;
   }
 
   printf(">> Closing client ...\n");
@@ -189,6 +226,7 @@ int main(int argc, char **argv) {
    * HINT: at this point, the client is (should be) properly logged out of
    * HINT: the name server, so this step should be easy :)
    */
+  // Close(name_server_socket);
 
   exit(EXIT_SUCCESS);
 }
