@@ -10,17 +10,16 @@ int  listen_socket     = -1;       // listen socket. initialized to -1.
 int num_active_clients = 0;
 client_t *clients[MAX_USERS];      // array of pointers to structs representing active clients.
 
-int connfd;
-socklen_t clientlen;
-struct sockaddr_storage clientaddr;
-char client_hostname[MAXLINE], client_port[MAXLINE];
+ int *connfd;
+  socklen_t clientlen;
+  struct sockaddr_storage clientaddr;
+  char client_hostname[MAXLINE], client_port[MAXLINE];
+  pthread_t tid;
 
-enum status status;
-int IPPORT_READ = 0;
-int userID=0;
+
+
 
 client_t *cl;
-
 
 /*
  * TODO: for implementing name_server.c, you will not receive as many
@@ -33,20 +32,16 @@ void echo(int con) {
     size_t n;
     char buf[MAX_LINE];
     rio_t rio;
+    int userID=0;
+    enum status status;
+    int IPPORT_READ = 0;
 
     Rio_readinitb(&rio, con);
    
     while ((n=Rio_readlineb(&rio, buf, MAXLINE)) != 0) {     
         if (strncmp("LOGIN", buf, MAX_REQUEST) == 0) {
            status = LOGIN_S;
-          // check if data matches in struct
-          // if yes then send msg to client
-          // if (strcmp(cl->usernameAndPassword, "hello")==0)
-          // {
-          //   printf("%s", "Logged in");
-          // }
           
-          // printf("%s", "Logged in");
           continue;
         }
         
@@ -72,17 +67,7 @@ void echo(int con) {
               break;
             }  
           }
-      
-// cl->usernameAndPassword
-            // if (strncmp(buf, clients[0]->usernameAndPassword, i-1) ==0) {
-                  
-            //   Rio_writen(con, ">>Logged in successfully!\n",28);
-            //   // printf("%s", "Logged in successfully!");
-            //   userID = 0;
 
-            //   break;
-            // }  
-          
           
           IPPORT_READ = 1;
           break;
@@ -104,8 +89,6 @@ void echo(int con) {
 
 //if using strncmp then count actual bytes.
 //if using n to compare then use actual bytes + 1 because of terminating null
-
-       
 
           break;      
         default:
@@ -149,7 +132,18 @@ void DBSETUP(){
 
 }
 
-int main(int argc, char **argv) {
+void *thread(void *vargp){
+  int confd = *((int *)vargp);
+  Pthread_detach(pthread_self());
+  Free(vargp);
+
+  echo(confd);
+
+  Close(confd);
+  return NULL;
+}
+
+int main(int argc, char **argv) { 
 
   if (argc != MAIN_ARGNUM + 1) {
     fprintf(stderr, "Usage: %s <listening port>\n", argv[0]);
@@ -179,18 +173,22 @@ int main(int argc, char **argv) {
   int running = 1;
   while (running) {
     clientlen = sizeof(struct sockaddr_storage);
-    connfd = Accept(listen_socket, (SA*)&clientaddr, &clientlen);
+  
+
+    connfd = malloc(sizeof(int));
+    *connfd = Accept(listen_socket, (SA*)&clientaddr, &clientlen);
+    
     Getnameinfo((SA*)&clientaddr, clientlen, client_hostname, MAXLINE,
           client_port, MAXLINE, 0);
 
     printf("Connected to (%s, %s)\n", client_hostname, client_port);
 
+    Pthread_create(&tid, NULL, thread,connfd);
     
-    echo(connfd);
-    
+
     // Close(connfd);
     // set running to 0 so it prints
-    running=0;
+    // running=0;
     /*
      * TODO: LISTEN FOR PEERS HERE
      * HINT: accept new peers on the listen_socket set up earlier.
