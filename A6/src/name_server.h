@@ -16,8 +16,13 @@ typedef struct client_t {
    *
    */
   char* usernameAndPassword;
+  char* username;
+  char* password;
   char* port;
   char* ip;
+  
+  //needed when quering logged-in users
+  int logged_in;
   
   int conn_socket;
 

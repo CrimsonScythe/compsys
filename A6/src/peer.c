@@ -59,6 +59,7 @@ int main(int argc, char **argv) {
   //TODO move this in worker thread later
   char buf2[MAXLINE];
   rio_t rio2;
+  rio_t rio3;
 
   int running = 1;
   while (running) {
@@ -111,11 +112,14 @@ int main(int argc, char **argv) {
          * HINT: eventually, you want to set logged_in to 1, but depending
          * HINT: on your protocol, you may want to somehow confirm the login first :)
          */
+
+        
         // logged_in = 1; 
             
         Rio_writen(name_server_socket, LOGIN_REQUEST, strlen(LOGIN_REQUEST));   
         Rio_writen(name_server_socket, "\n", 1);
         Rio_writen(name_server_socket, username, strlen(username));
+        Rio_writen(name_server_socket, "\n", 1);
         Rio_writen(name_server_socket, password, strlen(password));
         Rio_writen(name_server_socket, "\n", 1);
         Rio_writen(name_server_socket, my_port, PORT_LEN);
@@ -129,7 +133,25 @@ int main(int argc, char **argv) {
         while (1) {
           n=Rio_readlineb(&rio2, buf2,MAXLINE);
           if (n>0) {
+            
+            TODO: // make some check to ensure log in cred. are correct
+
+            // printf("%s", buf);
+
+            // int i;
+            // i = 0;
+            // while (buf2[i] != '\0') {
+            //   i++;
+            // }
+
+
+            if (strncmp(">>Logged in successfully!", buf2, 26) == 0)
+            {
+              logged_in = 1;
+            } 
+            
             Fputs(buf2, stdout);
+            
             break;
           }
         }
@@ -143,8 +165,31 @@ int main(int argc, char **argv) {
           break;
         }
 
-        username = args[1]; // username to lookup (may be null)
+        // Rio_readinitb(&rio3, name_server_socket);
 
+        char LOOKUP_REQUEST[] = "LOOKUP"; 
+
+        // username = malloc(sizeof(char));
+
+
+        username = args[0]; // username to lookup (may be null)
+
+
+        Rio_writen(name_server_socket, LOOKUP_REQUEST, strlen(LOOKUP_REQUEST));   
+        Rio_writen(name_server_socket, "\n", 1);
+        Rio_writen(name_server_socket, username, strlen(username));
+        Rio_writen(name_server_socket, "\n", 1);
+
+
+        // Rio_writen(name_server_socket, name, strlen(name));
+        // Rio_writen(name_server_socket, "\n", 1);  
+        
+        
+        while (1)
+        {
+          ;
+        }
+        
         /*
          * TODO #3
          * TODO: LOOKUP USERS HERE.

@@ -2,7 +2,7 @@
 #include "name_server.h"
 #define MAX_REQUEST   5
 
-enum status {LOGIN_S, LOGOUT_S};
+enum status {NONE, LOGIN_S,LOOKUP_S ,LOGOUT_S};
 
 char listen_port[PORT_LEN];
 int  listen_socket     = -1;       // listen socket. initialized to -1.
@@ -16,9 +16,6 @@ client_t *clients[MAX_USERS];      // array of pointers to structs representing 
   char client_hostname[MAXLINE], client_port[MAXLINE];
   pthread_t tid;
 
-
-
-
 client_t *cl;
 
 /*
@@ -29,49 +26,115 @@ client_t *cl;
  */
 
 void echo(int con) {
+
     size_t n;
     char buf[MAX_LINE];
     rio_t rio;
     int userID=0;
     enum status status;
+    status = NONE;
     int IPPORT_READ = 0;
+    int USERNAME_READ = 0;
+
+    int logged_in = 0;
 
     Rio_readinitb(&rio, con);
    
     while ((n=Rio_readlineb(&rio, buf, MAXLINE)) != 0) {     
+        printf("\n%d", (int)n);
+        printf("%s\n", buf);
+
         if (strncmp("LOGIN", buf, MAX_REQUEST) == 0) {
            status = LOGIN_S;
-          
+           
+          continue;
+        } 
+        // printf("%s", buf);
+        
+        else if (strncmp("LOOKUP", buf, 6) == 0)
+        {
+          // printf("%s", "LOOKUP");
+          status = LOOKUP_S;
           continue;
         }
         
-
+        
         switch (status) {
         case LOGIN_S:
 
-           if (IPPORT_READ == 0) {
+           if (USERNAME_READ == 0) {
             int i=0;
             while (buf[i] != '\0') {
               i++;
             }
-         
-         
-            for (int j = 0; j < MAX_USERS; j++)
-            {
-                if (strncmp(buf, clients[j]->usernameAndPassword, i-1) ==0) {
-                  
-              Rio_writen(con, ">>Logged in successfully!\n",28);
-              // printf("%s", "Logged in successfully!");
-              userID = j;
 
-              break;
-            }  
-          }
+              for (int j = 0; j < MAX_USERS; j++){
+                if (strncmp(buf, clients[j]->username, i-1) ==0) {
+                  
+                  // Rio_writen(con, ">>Logged in successfully!\n",28);
+              
+                  userID = j;
+                  USERNAME_READ = 1;
+                  // clients[userID]->logged_in = 1;
+
+                  break;
+                } else
+                {
+                  Rio_writen(con, ">>Login error!\n",28);
+                  break;
+                }
+                  
+              //TODO check else case if string is not matched
+              }
 
           
-          IPPORT_READ = 1;
+         
+          //   for (int j = 0; j < MAX_USERS; j++)
+          //   {
+          //       if (strncmp(buf, clients[j]->usernameAndPassword, i-1) ==0) {
+                  
+          //     Rio_writen(con, ">>Logged in successfully!\n",28);
+              
+          //     userID = j;
+
+          //     clients[userID]->logged_in = 1;
+
+          //     break;
+          //   }  
+          // }
+
+          
+          
+         
           break;
           }
+
+          if ((USERNAME_READ == 1) && (IPPORT_READ == 0)){
+            int i=0;
+            while (buf[i] != '\0') {
+              i++;
+            }
+
+            
+
+            if (strncmp(buf, clients[userID]->password, i-1) ==0) {
+              printf("%s\n", "works");    
+                  Rio_writen(con, ">>Logged in successfully!\n",26);
+            
+                  clients[userID]->logged_in = 1;
+                  IPPORT_READ = 1;
+
+                  break;
+            } else
+            {
+               Rio_writen(con, ">>Login error!\n",15);
+            }
+            
+            //TODO: check else case if string is not matched
+            
+            break;
+          }
+          
 
           if (n==9 && (IPPORT_READ==1)) {
             // cl->port=buf;
@@ -90,45 +153,82 @@ void echo(int con) {
 //if using strncmp then count actual bytes.
 //if using n to compare then use actual bytes + 1 because of terminating null
 
-          break;      
+          break;   
+
+        case LOOKUP_S:
+
+            // int i=0;
+            // while (buf[i] != '\0') {
+            //   i++;
+            // }
+
+            // for (int j = 0; j < MAX_USERS; j++){
+
+            //   // only check for logged in users
+            //   if (clients[j]->logged_in == 1)
+            //   {
+                
+            //   }
+              
+
+            //     if (strncmp(buf, clients[j]->username, i-1) ==0) {
+                  
+            //       // Rio_writen(con, ">>Logged in successfully!\n",28);
+              
+            //       userID = j;
+            //       USERNAME_READ = 1;
+            //       // clients[userID]->logged_in = 1;
+
+            //       break;
+            //     }  
+            //   //TODO check else case if string is not matched
+            //   }
+            
+          
+
+          break;
+
         default:
           break;
         }
+
+        
+
     }  
 }
 
 void DBSETUP(){
 
-  // cl = malloc(sizeof(client_t));
-  // cl->usernameAndPassword = "ab";
-
-
-// clients[0] = malloc(sizeof(struct client_t));
-// clients[0]->usernameAndPassword = "ab";
-  
   for (int i = 0; i < MAX_USERS; i++)
   {
     clients[i] = malloc(sizeof(client_t));
+
+    clients[i]->logged_in = 0;
   }
 
+  clients[0]->username = "a";
+  clients[1]->username = "suhail";
+  clients[2]->username = "haseeb";
+  clients[3]->username = "sara";
+  clients[4]->username = "nikolai";
 
-  // printf("%s", clients[0]->usernameAndPassword);
-  clients[0]->usernameAndPassword = "ab";
-  clients[1]->usernameAndPassword = "suhailMeowthIsUgly";
-  clients[2]->usernameAndPassword = "haseebMaximumDrift";
-  clients[3]->usernameAndPassword = "saraJokerIsUnderrated";
-  clients[4]->usernameAndPassword = "nikolaiColaHeist";
-  clients[5]->usernameAndPassword = "bb";
-  clients[6]->usernameAndPassword = "ss";
-  clients[7]->usernameAndPassword = "gg";
-  clients[8]->usernameAndPassword = "lollol";
-  clients[9]->usernameAndPassword = "troglador";
-  clients[10]->usernameAndPassword = "nnn";
-  clients[11]->usernameAndPassword = "flak";
-  clients[12]->usernameAndPassword = "hahah";
-  clients[13]->usernameAndPassword = "hehe";
-  clients[14]->usernameAndPassword = "nene";
-  clients[15]->usernameAndPassword = "kk";
+  clients[0]->password = "b";
+  clients[1]->password = "GigantimaxMeowthIsUgly";
+  clients[2]->password = "MaximumDrift";
+  clients[3]->password = "JokerIsUnderrated";
+  clients[4]->password = "ColaHeist";
+
+  // clients[5]->usernameAndPassword = "bb";
+  // clients[6]->usernameAndPassword = "ss";
+  // clients[7]->usernameAndPassword = "gg";
+  // clients[8]->usernameAndPassword = "lollol";
+  // clients[9]->usernameAndPassword = "troglador";
+  // clients[10]->usernameAndPassword = "nnn";
+  // clients[11]->usernameAndPassword = "flak";
+  // clients[12]->usernameAndPassword = "hahah";
+  // clients[13]->usernameAndPassword = "hehe";
+  // clients[14]->usernameAndPassword = "nene";
+  // clients[15]->usernameAndPassword = "kk";
 
 }
 
