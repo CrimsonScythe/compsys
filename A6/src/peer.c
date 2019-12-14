@@ -223,10 +223,14 @@ int main(int argc, char **argv) {
         while (1) {
           n=Rio_readlineb(&rio2, buf3,MAXLINE);
           if (n>0) {
-      
 
 
-        //TODO check error
+            if (strncmp(">>No user found", buf3, 15) == 0)
+            {
+              Fputs(buf3, stdout);
+              break;
+            } 
+       
 
             if (counter == 0){
               numOfUsers=atoi(buf3);
@@ -287,11 +291,6 @@ int main(int argc, char **argv) {
         while (1) {
           n=Rio_readlineb(&rio2, buf3,MAXLINE);
           if (n>0) {
-
-            // if (strncmp(">>Logged in successfully!", buf2, 25) == 0)
-            // {
-            //   logged_in = 1;
-            // } 
             
             Fputs(buf3, stdout);
             logged_in=0;
@@ -316,6 +315,7 @@ int main(int argc, char **argv) {
         {
           printf("%s\n", "Please logout first");
         } else {
+          free(saveduser);
           running = 0;
         }
         
@@ -364,7 +364,7 @@ int main(int argc, char **argv) {
    * HINT: at this point, the client is (should be) properly logged out of
    * HINT: the name server, so this step should be easy :)
    */
-  // Close(name_server_socket);
+  Close(name_server_socket);
 
   exit(EXIT_SUCCESS);
 }

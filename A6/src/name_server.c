@@ -4,6 +4,8 @@
 
 enum status {NONE, LOGIN_S, LOGIN_S_END, LOOKUP_S, LOOKUP_S_END ,LOGOUT_S};
 
+pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 char listen_port[PORT_LEN];
 int  listen_socket     = -1;       // listen socket. initialized to -1.
 
@@ -26,7 +28,6 @@ client_t *cl;
  */
 
 void echo(int con) {
-
     size_t n;
     char buf[MAX_LINE];
     rio_t rio;
@@ -66,8 +67,8 @@ void echo(int con) {
           continue;
         }
 
-        
-        
+        pthread_mutex_lock(&clients_mutex);
+
         switch (status) {
         case LOGIN_S:
 
@@ -181,6 +182,7 @@ void echo(int con) {
           if (strlen(buf) > 0)
           {
 
+            int found=0;
             
 
             int i=0;
@@ -199,7 +201,7 @@ void echo(int con) {
                 if (strncmp(buf, clients[j]->username, i-1) ==0) {
                   printf("heh%s\n", clients[j]->ip);
                     // char* t = strdup(clients[j]->username);
-
+                    found=1;
                     Rio_writen(con, "1", strlen("1"));
                     Rio_writen(con, "\n" ,1);
 
@@ -224,10 +226,18 @@ void echo(int con) {
                 
               //TODO check else case if string is not matched
               }
+
+              if (found==0)
+              {
+                Rio_writen(con, ">>No user found" ,strlen(">>No user found"));
+                Rio_writen(con, "\n" ,1);
+              }
+              
+
             } else{
 //TODO mutex in threading
 
-
+            
             // int i=0;
             // while (buf[i] != '\0') {
             //   i++;
@@ -262,6 +272,7 @@ void echo(int con) {
               // only check for logged in users
               if (clients[j]->logged_in == 1)
               {
+
                     Rio_writen(con, ">>UserName:" ,strlen(">>UserName:"));
                     Rio_writen(con, clients[j]->username ,strlen(clients[j]->username));
                     Rio_writen(con, "  ¦  " ,strlen("  ¦  "));
@@ -279,6 +290,8 @@ void echo(int con) {
 
               //TODO check else case if string is not matched
               }            
+
+ 
 
             }
 
@@ -307,7 +320,7 @@ void echo(int con) {
                     clients[j]->logged_in = 0;
                     clients[j]->port = 0;
                     clients[j]->ip = 0;
-                    Rio_writen(con, ">>logged out" ,strlen(">>logged out"));
+                    Rio_writen(con, ">>Logged out" ,strlen(">>Logged out"));
                     Rio_writen(con, "\n" ,1);
 
             }
@@ -326,7 +339,7 @@ void echo(int con) {
           break;
         }
 
-        
+        pthread_mutex_unlock(&clients_mutex);
 
     }  
 }
@@ -420,11 +433,9 @@ int main(int argc, char **argv) {
     printf("Connected to (%s, %s)\n", client_hostname, client_port);
 
     Pthread_create(&tid, NULL, thread,connfd);
-    
 
-    // Close(connfd);
-    // set running to 0 so it prints
-    // running=0;
+
+
     /*
      * TODO: LISTEN FOR PEERS HERE
      * HINT: accept new peers on the listen_socket set up earlier.
