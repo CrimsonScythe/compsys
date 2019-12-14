@@ -55,9 +55,12 @@ int main(int argc, char **argv) {
   char *username, *password;  // these pointers will serve different
   char *ip, *port;            // purposes based on the current command.
   char *message;
+  char *saveduser;
 
   //TODO move this in worker thread later
   char buf2[MAXLINE];
+  char buf3[MAXLINE];
+  char buf4[MAXLINE];
   rio_t rio2;
   rio_t rio3;
 
@@ -145,13 +148,18 @@ int main(int argc, char **argv) {
             // }
 
 
-            if (strncmp(">>Logged in successfully!", buf2, 26) == 0)
+            if (strncmp(">>Logged in successfully!", buf2, 25) == 0)
             {
               logged_in = 1;
             } 
             
+
+
             Fputs(buf2, stdout);
             
+            // save username in variable
+            saveduser = strdup(username);
+
             break;
           }
         }
@@ -174,20 +182,71 @@ int main(int argc, char **argv) {
 
         username = args[0]; // username to lookup (may be null)
 
+        
+        
+
+        // printf("%ld", strlen((char*) username));
+
+        // if (username == NULL)
+        // {
+          
+        // }
+        
 
         Rio_writen(name_server_socket, LOOKUP_REQUEST, strlen(LOOKUP_REQUEST));   
         Rio_writen(name_server_socket, "\n", 1);
-        Rio_writen(name_server_socket, username, strlen(username));
+        if (username != NULL)
+        {
+          Rio_writen(name_server_socket, username, strlen(username));
+          
+        } else {
+          Rio_writen(name_server_socket, "", 1);
+        }
         Rio_writen(name_server_socket, "\n", 1);
 
+
+        
 
         // Rio_writen(name_server_socket, name, strlen(name));
         // Rio_writen(name_server_socket, "\n", 1);  
         
+        int counter=0;
+        int numOfUsers=0;
+
+        // while (1)
+        // {
+        //   n=Rio_readlineb(&rio2, buf3,MAXLINE);
+        //   Fputs(buf3, stdout);
+        // }
         
-        while (1)
-        {
-          ;
+
+        while (1) {
+          n=Rio_readlineb(&rio2, buf3,MAXLINE);
+          if (n>0) {
+      
+
+
+        //TODO check error
+
+            if (counter == 0){
+              numOfUsers=atoi(buf3);
+              counter++;
+              continue;
+            }
+
+            //printf("%d\n", atoi(buf3));
+            
+            
+            Fputs(buf3, stdout);
+
+            if (counter == numOfUsers)
+            {
+              break;
+            }
+
+            counter++;
+       
+          }
         }
         
         /*
@@ -207,6 +266,8 @@ int main(int argc, char **argv) {
           printf(">> /logout error: not logged onto name server.\n");
           break;
         }
+
+
         /*
          * TODO #4
          * TODO: LOGOUT OF NAME SERVER HERE.
@@ -215,11 +276,34 @@ int main(int argc, char **argv) {
          */
         // logged_in = 0;
 
+        // printf("%s\n", saveduser);
+             
+        Rio_writen(name_server_socket, "LOGOUT", strlen("LOGOUT"));   
+        Rio_writen(name_server_socket, "\n", 1);
+
+        Rio_writen(name_server_socket, saveduser, strlen(saveduser));
+        Rio_writen(name_server_socket, "\n", 1);
+      
+        while (1) {
+          n=Rio_readlineb(&rio2, buf3,MAXLINE);
+          if (n>0) {
+
+            // if (strncmp(">>Logged in successfully!", buf2, 25) == 0)
+            // {
+            //   logged_in = 1;
+            // } 
+            
+            Fputs(buf3, stdout);
+            logged_in=0;
+            break;
+          }
+        }
+        
         break;
 
 
       case EXIT:
-        running = 0;
+        
         /*
          * TODO #5
          * TODO: EXIT CLIENT HERE.
@@ -227,6 +311,15 @@ int main(int argc, char **argv) {
          * HINT: as is, the client simply exits. depending on your protocol,
          * HINT: consider what should happen if the user is logged in at exit.
          */
+
+        if (logged_in == 1)
+        {
+          printf("%s\n", "Please logout first");
+        } else {
+          running = 0;
+        }
+        
+
         break;
 
 

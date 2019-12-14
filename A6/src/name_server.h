@@ -2,7 +2,7 @@
 #include "common.h"
 
 #define MAIN_ARGNUM 1
-#define MAX_USERS   16
+#define MAX_USERS   5
 
 typedef struct client_t {
   

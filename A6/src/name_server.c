@@ -2,7 +2,7 @@
 #include "name_server.h"
 #define MAX_REQUEST   5
 
-enum status {NONE, LOGIN_S,LOOKUP_S ,LOGOUT_S};
+enum status {NONE, LOGIN_S, LOGIN_S_END, LOOKUP_S, LOOKUP_S_END ,LOGOUT_S};
 
 char listen_port[PORT_LEN];
 int  listen_socket     = -1;       // listen socket. initialized to -1.
@@ -17,7 +17,7 @@ client_t *clients[MAX_USERS];      // array of pointers to structs representing 
   pthread_t tid;
 
 client_t *cl;
-
+//TODO: accessing glocal variale
 /*
  * TODO: for implementing name_server.c, you will not receive as many
  * TODO: hints as you did for peer.c :) the two TODO's within the main()
@@ -40,23 +40,32 @@ void echo(int con) {
 
     Rio_readinitb(&rio, con);
    
-    while ((n=Rio_readlineb(&rio, buf, MAXLINE)) != 0) {     
-        printf("\n%d", (int)n);
+    while ((n=Rio_readlineb(&rio, buf, MAXLINE)) != 0) {
+
         printf("%s\n", buf);
 
-        if (strncmp("LOGIN", buf, MAX_REQUEST) == 0) {
+        if ((strncmp("LOGIN", buf, MAX_REQUEST) == 0) && (status==NONE)) {
            status = LOGIN_S;
            
           continue;
-        } 
-        // printf("%s", buf);
+        }
+                // else if (strncmp("LOOKUP", buf, 6) == 0 && (status != LOGIN_S))
+
         
-        else if (strncmp("LOOKUP", buf, 6) == 0)
+        else if (strncmp("LOOKUP", buf, 6) == 0 && ((status == LOGIN_S_END) || (status == LOOKUP_S) || (status == LOOKUP_S_END)))
         {
-          // printf("%s", "LOOKUP");
+
+          printf("%s\n", "YOLO");
           status = LOOKUP_S;
           continue;
         }
+         else if ((strncmp("LOGOUT", buf, 6) == 0) && ((status == LOOKUP_S_END) || (status == LOGIN_S_END)))
+        {
+          printf("%s\n", "LOGGING OUT :)");
+          status = LOGOUT_S;
+          continue;
+        }
+
         
         
         switch (status) {
@@ -67,28 +76,34 @@ void echo(int con) {
             while (buf[i] != '\0') {
               i++;
             }
-
+            printf("yellow%s", buf);
               for (int j = 0; j < MAX_USERS; j++){
                 if (strncmp(buf, clients[j]->username, i-1) ==0) {
                   
                   // Rio_writen(con, ">>Logged in successfully!\n",28);
-              
+
+                  printf("%s", "this works");
+
                   userID = j;
                   USERNAME_READ = 1;
                   // clients[userID]->logged_in = 1;
 
                   break;
-                } else
-                {
-                  Rio_writen(con, ">>Login error!\n",28);
-                  break;
                 }
+                
+                
+                  
+                  // break;
+                
                   
               //TODO check else case if string is not matched
               }
-
-          
-         
+              if (USERNAME_READ==0)
+              {
+                  Rio_writen(con, ">>Login error!\n",28);             
+              }
+              
+              
           //   for (int j = 0; j < MAX_USERS; j++)
           //   {
           //       if (strncmp(buf, clients[j]->usernameAndPassword, i-1) ==0) {
@@ -127,6 +142,8 @@ void echo(int con) {
                   break;
             } else
             {
+               USERNAME_READ=0;
+               status = NONE;
                Rio_writen(con, ">>Login error!\n",15);
             }
             
@@ -138,15 +155,18 @@ void echo(int con) {
 
           if (n==9 && (IPPORT_READ==1)) {
             // cl->port=buf;
-            clients[userID]->port = buf; 
+            clients[userID]->port = strdup(buf); 
             printf("port is: %s\n", buf);
             break;
           }
           if (n==17 && (IPPORT_READ==1)) {
             // cl->ip=buf;
-            clients[userID]->ip = buf;
+            clients[userID]->ip = strdup(buf);
             printf("ip is: %s\n", buf);
             
+            // chane enum here since login competed
+            status = LOGIN_S_END;
+
             break;
           }
 
@@ -156,37 +176,151 @@ void echo(int con) {
           break;   
 
         case LOOKUP_S:
+        // buf != NULL
+          printf("%s\n", "we are in");
+          if (strlen(buf) > 0)
+          {
+
+            
+
+            int i=0;
+            while (buf[i] != '\0') {
+              i++;
+            }
+
+      
+
+
+            for (int j = 0; j < MAX_USERS; j++){
+
+              // only check for logged in users
+              if (clients[j]->logged_in == 1)
+              {
+                if (strncmp(buf, clients[j]->username, i-1) ==0) {
+                  printf("heh%s\n", clients[j]->ip);
+                    // char* t = strdup(clients[j]->username);
+
+                    Rio_writen(con, "1", strlen("1"));
+                    Rio_writen(con, "\n" ,1);
+
+                    Rio_writen(con, ">>UserName:" ,strlen(">>UserName:"));
+                    Rio_writen(con, clients[j]->username ,strlen(clients[j]->username));
+                    Rio_writen(con, "  ¦  " ,strlen("  ¦  "));
+
+                    Rio_writen(con, ">>IP:" ,strlen(">>IP:"));
+                    Rio_writen(con, clients[j]->ip ,strlen(clients[j]->ip));
+                    Rio_writen(con, "  ¦  " ,strlen("  ¦  "));
+
+                    Rio_writen(con, ">>Port:" ,strlen(">>Port:"));
+                    Rio_writen(con, clients[j]->port ,strlen(clients[j]->port));
+                    Rio_writen(con, "\n" ,1);
+
+
+                  break;
+                }  
+              }
+              
+
+                
+              //TODO check else case if string is not matched
+              }
+            } else{
+//TODO mutex in threading
+
 
             // int i=0;
             // while (buf[i] != '\0') {
             //   i++;
             // }
 
-            // for (int j = 0; j < MAX_USERS; j++){
-
-            //   // only check for logged in users
-            //   if (clients[j]->logged_in == 1)
-            //   {
-                
-            //   }
-              
-
-            //     if (strncmp(buf, clients[j]->username, i-1) ==0) {
-                  
-            //       // Rio_writen(con, ">>Logged in successfully!\n",28);
-              
-            //       userID = j;
-            //       USERNAME_READ = 1;
-            //       // clients[userID]->logged_in = 1;
-
-            //       break;
-            //     }  
-            //   //TODO check else case if string is not matched
-            //   }
             
-          
 
+            int count=0;
+
+            for (int j = 0; j < MAX_USERS; j++){
+
+              // only check for logged in users
+              if (clients[j]->logged_in == 1)
+              {
+                //number of logged in users
+                count++;
+
+              }
+
+              //TODO check else case if string is not matched
+            }
+
+            printf("Amount of users: %d\n", count);
+
+            char* cccc = malloc(sizeof(char));
+            sprintf(cccc, "%d", count);
+            Rio_writen(con, cccc , strlen(cccc));
+            Rio_writen(con, "\n" , 1);
+
+             for (int j = 0; j < MAX_USERS; j++){
+
+              // only check for logged in users
+              if (clients[j]->logged_in == 1)
+              {
+                    Rio_writen(con, ">>UserName:" ,strlen(">>UserName:"));
+                    Rio_writen(con, clients[j]->username ,strlen(clients[j]->username));
+                    Rio_writen(con, "  ¦  " ,strlen("  ¦  "));
+
+                    Rio_writen(con, ">>IP:" ,strlen(">>IP:"));
+                    Rio_writen(con, clients[j]->ip ,strlen(clients[j]->ip));
+                    Rio_writen(con, "  ¦  " ,strlen("  ¦  "));
+
+                    Rio_writen(con, ">>Port:" ,strlen(">>Port:"));
+                    Rio_writen(con, clients[j]->port ,strlen(clients[j]->port));
+                    Rio_writen(con, "\n" ,1);
+
+              }
+              
+
+              //TODO check else case if string is not matched
+              }            
+
+            }
+
+            status = LOOKUP_S_END;
+          
           break;
+
+        case LOGOUT_S:
+
+        if (1)
+        {
+          /* code */  
+            
+          printf("jdfgjkdfbjkd%s\n", buf);
+
+            int i=0;
+            while (buf[i] != '\0') {
+              i++;
+            }
+
+          for (int j = 0; j < MAX_USERS; j++){
+
+              // only check for logged in users
+            if (strncmp(buf, clients[j]->username, i-1) ==0){
+                 
+                    clients[j]->logged_in = 0;
+                    clients[j]->port = 0;
+                    clients[j]->ip = 0;
+                    Rio_writen(con, ">>logged out" ,strlen(">>logged out"));
+                    Rio_writen(con, "\n" ,1);
+
+            }
+              
+
+              //TODO check else case if string is not matched
+          }            
+
+        // how to decide which struct to erase?
+
+          break;  
+
+        }
 
         default:
           break;
@@ -207,16 +341,18 @@ void DBSETUP(){
   }
 
   clients[0]->username = "a";
-  clients[1]->username = "suhail";
-  clients[2]->username = "haseeb";
+  clients[1]->username = "b";
+  clients[2]->username = "c";
   clients[3]->username = "sara";
   clients[4]->username = "nikolai";
 
-  clients[0]->password = "b";
-  clients[1]->password = "GigantimaxMeowthIsUgly";
-  clients[2]->password = "MaximumDrift";
+  clients[0]->password = "a";
+  clients[1]->password = "b";
+  clients[2]->password = "c";
   clients[3]->password = "JokerIsUnderrated";
   clients[4]->password = "ColaHeist";
+
+  
 
   // clients[5]->usernameAndPassword = "bb";
   // clients[6]->usernameAndPassword = "ss";
