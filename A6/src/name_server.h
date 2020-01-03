@@ -1,5 +1,6 @@
 #pragma once
 #include "common.h"
+#include "buffer.h"
 
 #define MAIN_ARGNUM 1
 #define MAX_USERS   5
@@ -25,5 +26,7 @@ typedef struct client_t {
   int logged_in;
   
   int conn_socket;
+
+  linked_queue *queue[MAX_USERS];
 
 } client_t;

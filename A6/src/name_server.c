@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include "name_server.h"
+#include "buffer.c"
 #define MAX_REQUEST   5
 
-enum status {NONE, LOGIN_S, LOGIN_S_END, LOOKUP_S, LOOKUP_S_END ,LOGOUT_S};
+enum status {NONE, LOGIN_S, LOGIN_S_END, LOOKUP_S, LOOKUP_S_END ,LOGOUT_S,
+ MSG_S, SHOW_S};
 
 pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -13,6 +15,7 @@ int  listen_socket     = -1;       // listen socket. initialized to -1.
 int num_active_clients = 0;
 
 client_t *clients[MAX_USERS];      // array of pointers to structs representing active clients.
+
 
 int *connfd;
 
@@ -37,7 +40,13 @@ void echo(int con) {
     int IPPORT_READ = 0;
     int USERNAME_READ = 0;
     int logged_in = 0;
+    int MSG_READY=0;
+    int msg_user_index;
     
+
+   
+   
+
     Rio_readinitb(&rio, con);
     
     while ((n=Rio_readlineb(&rio, buf, MAXLINE)) != 0) {
@@ -56,7 +65,15 @@ void echo(int con) {
           printf("%s\n", "LOGGING OUT :)");
           status = LOGOUT_S;
           continue;
+        } else if ((strncmp("MSG", buf, 3) == 0)) {
+          status = MSG_S;
+          continue;
+        } else if ((strncmp("SHOW", buf, 4) == 0))
+        {
+          status = SHOW_S;
+          continue;
         }
+        
 
         pthread_mutex_lock(&clients_mutex);
         
@@ -113,6 +130,10 @@ void echo(int con) {
             clients[userID]->ip = strdup(buf);
             printf("ip is: %s\n", buf);
             status = LOGIN_S_END;
+
+            // queue for messages intia here
+            
+
             break;
           }
           break;   
@@ -203,9 +224,102 @@ void echo(int con) {
           }            
           break;  
         }
+        case MSG_S:
+
+        if (MSG_READY==0)
+        {
+
+        //receive username here and make checks on username
+
+        int j=0;
+        while (buf[j] != '\0') {
+          j++;
+        }
+        
+        for (int i = 0; i < MAX_USERS; i++)
+        {
+          if (strncmp(buf, clients[i]->username, j-1) == 0)
+          {
+            if ((clients[i]->logged_in) == 0)
+            {
+
+              Rio_writen(con, ">>User is not logged in" ,strlen(">>User is not logged in"));
+              Rio_writen(con, "\n" ,1);
+              break;
+            } else {
+              msg_user_index = i; 
+              MSG_READY=1;
+              break;
+            }
+            
+          }
+          
+        }
+
+        if (MSG_READY==0)
+        {
+          /* code */
+        
+        
+        Rio_writen(con, ">>User deos not exist" ,strlen(">>User deos not exist"));
+        Rio_writen(con, "\n" ,1);
+        
+        }
+
+        break;
+
+        } else {
+          
+          int my_user_index = userID; 
+   
+        //TODO
+        
+          enqueue(clients[msg_user_index]-> queue[my_user_index], buf, strlen(buf));
+
+          // printf("%imsgone\n", msg_user_index);
+          // printf("%imsgtwo\n", my_user_index);
+
+          Rio_writen(con, ">>msg sent" ,strlen(">>msg sent"));
+          Rio_writen(con, "\n" ,1);
+
+          break;
+
+        }
+        case SHOW_S:
+
+        if (1)
+        {
+          /* code */
+        
+        int ID;
+
+        char msg_buf[MAXLINE];
+        for (int i = 0; i < MAX_USERS; i++)
+        {
+          if (strncmp(buf, clients[userID]->queue[i] -> name, strlen(buf))==0)
+          {
+            ID = i;
+            break;
+          }
+          
+          
+        }
+
+        dequeue(clients[userID]->queue[ID], msg_buf, clients[userID]-> queue[ID] ->head->data_len);
+
+        Rio_writen(con, msg_buf ,strlen(msg_buf));
+        Rio_writen(con, "\n" ,1);
+        
+        break;
+
+        }
+        
+
+       
+
         default: break;
       }
-      
+
     pthread_mutex_unlock(&clients_mutex);
   }  
 }
@@ -214,6 +328,9 @@ void DBSETUP(){
   for (int i = 0; i < MAX_USERS; i++) {
     clients[i] = malloc(sizeof(client_t));
     clients[i]->logged_in = 0;
+
+    //TODO set empty queue?
+
   }
   clients[0]->username = "a";
   clients[1]->username = "b";
@@ -226,6 +343,23 @@ void DBSETUP(){
   clients[2]->password = "c";
   clients[3]->password = "LOGIN";
   clients[4]->password = "LOOKUP";
+
+  for (int i = 0; i < MAX_USERS; i++) {
+    
+
+    for (int j = 0; j < MAX_USERS; j++){
+      clients[i] -> queue[j] = malloc(sizeof(linked_queue));
+      clients[i] -> queue[j] -> name = clients[j]->username;
+
+      //TODO check these two
+      // clients[i] -> queue[j] -> head = malloc(sizeof(queue_node));
+      // clients[i] -> queue[j] -> tail = malloc(sizeof(queue_node));
+    }
+
+
+  }
+
+
 }
 
 void *thread(void *vargp){
@@ -237,28 +371,40 @@ void *thread(void *vargp){
   return NULL;
 }
 int main(int argc, char **argv) { 
+
   if (argc != MAIN_ARGNUM + 1) {
+
     fprintf(stderr, "Usage: %s <listening port>\n", argv[0]);
     exit(EXIT_FAILURE);
-  } else if (!is_valid_port(argv[1])) {
+  } 
+  else if (!is_valid_port(argv[1])) {
     fprintf(stderr, ">> Invalid port number: %s\n", argv[1]);
     exit(EXIT_FAILURE);
+
   }
   snprintf(listen_port, PORT_LEN, argv[1]);
+
   for (int i = 0; i < MAX_USERS; i++)
     clients[i] = NULL;
+
   DBSETUP();
+  
   printf(">> Accepting peers on port %s ...\n", listen_port);
+  
   listen_socket = Open_listenfd(listen_port);
+  
   int running = 1;
+  
   while (running) {
     clientlen = sizeof(struct sockaddr_storage);
     connfd = malloc(sizeof(int));
     *connfd = Accept(listen_socket, (SA*)&clientaddr, &clientlen);
     Getnameinfo((SA*)&clientaddr, clientlen, client_hostname, MAXLINE,
       client_port, MAXLINE, 0);
+
     printf("Connected to (%s, %s)\n", client_hostname, client_port);
     Pthread_create(&tid, NULL, thread,connfd);
   }
+  
   exit(EXIT_SUCCESS);
 }

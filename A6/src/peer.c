@@ -214,10 +214,26 @@ int main(int argc, char **argv) {
           printf(">> /msg error: not logged onto name server.\n");
           break;
         }
-        username = args[1]; // username of recipient.
-        message  = args[2]; // actual message to send.
+        username = args[0]; // username of recipient.
+        message  = args[1]; // actual message to send.
 
-        
+        // printf("%s\n", message);
+
+        Rio_writen(name_server_socket, "MSG", strlen("MSG"));   
+        Rio_writen(name_server_socket, "\n", 1);
+        Rio_writen(name_server_socket, username, strlen(username));
+        Rio_writen(name_server_socket, "\n", 1);
+        Rio_writen(name_server_socket, message, strlen(message));
+        Rio_writen(name_server_socket, "\n", 1);    
+
+        while (1) {
+          n=Rio_readlineb(&rio2, buf3,MAXLINE);
+          if (n>0) {          
+            Fputs(buf3, stdout);
+           
+            break;
+          }
+        }      
 
         break;
      
@@ -226,7 +242,23 @@ int main(int argc, char **argv) {
           printf(">> /show error: not logged onto name server.\n");
           break;
         }
-        username = args[1]; // name of user to show messages from (may be NULL)
+        username = args[0]; // name of user to show messages from (may be NULL)
+        
+        Rio_writen(name_server_socket, "SHOW", strlen("SHOW"));   
+        Rio_writen(name_server_socket, "\n", 1);
+        Rio_writen(name_server_socket, username, strlen(username));
+        Rio_writen(name_server_socket, "\n", 1);
+
+
+        while (1) {
+          n=Rio_readlineb(&rio2, buf3,MAXLINE);
+          if (n>0) {          
+            Fputs(buf3, stdout);
+           
+            break;
+          }
+        }      
+        
         break;
       case ERROR:
         printf(">> Error: unknown command or wrong number of arguments.\n");
