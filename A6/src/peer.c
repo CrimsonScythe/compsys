@@ -63,6 +63,8 @@ int main(int argc, char **argv) {
   char buf2[MAXLINE];
   
   char buf3[MAXLINE];
+
+  char baf[MAXLINE];
   
   char buf4[MAXLINE];
   
@@ -227,9 +229,9 @@ int main(int argc, char **argv) {
         Rio_writen(name_server_socket, "\n", 1);    
 
         while (1) {
-          n=Rio_readlineb(&rio2, buf3,MAXLINE);
+          n=Rio_readlineb(&rio2, buf4,MAXLINE);
           if (n>0) {          
-            Fputs(buf3, stdout);
+            Fputs(buf4, stdout);
            
             break;
           }
@@ -238,6 +240,13 @@ int main(int argc, char **argv) {
         break;
      
       case SHOW:
+
+      if (1)
+      {
+         size_t n1;
+      
+      
+
         if (!logged_in) {
           printf(">> /show error: not logged onto name server.\n");
           break;
@@ -251,15 +260,17 @@ int main(int argc, char **argv) {
 
 
         while (1) {
-          n=Rio_readlineb(&rio2, buf3,MAXLINE);
-          if (n>0) {          
-            Fputs(buf3, stdout);
+          n1=Rio_readlineb(&rio2, buf4,MAXLINE);
+          if (n1>0) {          
+            Fputs(buf4, stdout);
            
             break;
           }
         }      
         
         break;
+
+        }
       case ERROR:
         printf(">> Error: unknown command or wrong number of arguments.\n");
         break;

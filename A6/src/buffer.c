@@ -41,6 +41,8 @@ ssize_t dequeue(linked_queue* queue, char* buffer, size_t len) {
             queue -> head = queue -> tail = NULL;
         }
         queue -> head = cur_head -> next;
+    
+
         free(cur_head -> data);
         free(cur_head);
         return 0;
@@ -51,6 +53,7 @@ ssize_t dequeue(linked_queue* queue, char* buffer, size_t len) {
         cur_head -> data = Realloc(cur_head -> data, cur_head -> data_len);
         return cur_head -> data_len;
     }
+    
 }
 
 void set_empty_queue(linked_queue* queue) {
@@ -58,4 +61,6 @@ void set_empty_queue(linked_queue* queue) {
         queue->tail = NULL;
         //TODO check this
         queue->name = NULL;
+        // queue->head->data_len=0;
+
 }

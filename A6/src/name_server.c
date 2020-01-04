@@ -66,6 +66,12 @@ void echo(int con) {
           status = LOGOUT_S;
           continue;
         } else if ((strncmp("MSG", buf, 3) == 0)) {
+          if (status==SHOW_S)
+          {
+            MSG_READY=0;
+          }
+          
+          // MSG_READY=0;
           status = MSG_S;
           continue;
         } else if ((strncmp("SHOW", buf, 4) == 0))
@@ -271,16 +277,32 @@ void echo(int con) {
         } else {
           
           int my_user_index = userID; 
-   
+
+          int j=0;
+          while (buf[j] != '\0') {
+          j++;
+          }
+
         //TODO
-        
-          enqueue(clients[msg_user_index]-> queue[my_user_index], buf, strlen(buf));
+
+          printf("%imsgidsend\n", msg_user_index);
+          printf("%imyidsend\n", my_user_index);
+
+          enqueue(clients[msg_user_index]-> queue[my_user_index], buf, j-1);
+
+          // printf("%limsg ret value send\n", clients[msg_user_index]-> queue[my_user_index] ->head->data_len);
 
           // printf("%imsgone\n", msg_user_index);
           // printf("%imsgtwo\n", my_user_index);
 
           Rio_writen(con, ">>msg sent" ,strlen(">>msg sent"));
           Rio_writen(con, "\n" ,1);
+
+
+          //important to reset this flag
+          // ensures multiple msgs to same usr get handled correctely
+          // by the protocol
+          MSG_READY=0;
 
           break;
 
@@ -289,15 +311,22 @@ void echo(int con) {
 
         if (1)
         {
-          /* code */
         
+        int j=0;
+        while (buf[j] != '\0') {
+          j++;
+        }
+        
+        printf("%s\n", buf);
+        printf("%s\n", clients[userID]->queue[1] -> name);
         int ID;
 
         char msg_buf[MAXLINE];
         for (int i = 0; i < MAX_USERS; i++)
         {
-          if (strncmp(buf, clients[userID]->queue[i] -> name, strlen(buf))==0)
+          if (strncmp(buf, clients[userID]->queue[i] -> name, j-1)==0)
           {
+            
             ID = i;
             break;
           }
@@ -305,7 +334,36 @@ void echo(int con) {
           
         }
 
-        dequeue(clients[userID]->queue[ID], msg_buf, clients[userID]-> queue[ID] ->head->data_len);
+        printf("%imsgidshow\n", ID);
+        printf("%imyidshow\n", userID);
+
+        // printf("%limsg ret value show\n", clients[userID]-> queue[ID] ->head->data_len);
+        size_t size;
+        if (clients[userID] -> queue[ID] -> head == NULL)
+        {
+          printf("%i\n", 1);
+          size=0;
+        } else {
+          size = clients[userID]-> queue[ID] ->head->data_len;
+        }
+        if (size!=0)
+        {
+          int i =dequeue(clients[userID]->queue[ID], msg_buf, size);
+        }
+        
+        
+        // printf("%i\n", i);
+        // printf("%s\n", msg_buf);
+
+        if (size==0)  
+        {
+        // Rio_writen(con, "\n" ,1);  
+        Rio_writen(con, ">>no new msgs" ,strlen(">>no new msgs"));
+        Rio_writen(con, "\n" ,1);
+        break;  
+        }
+        
+
 
         Rio_writen(con, msg_buf ,strlen(msg_buf));
         Rio_writen(con, "\n" ,1);
@@ -350,15 +408,16 @@ void DBSETUP(){
     for (int j = 0; j < MAX_USERS; j++){
       clients[i] -> queue[j] = malloc(sizeof(linked_queue));
       clients[i] -> queue[j] -> name = clients[j]->username;
-
+      // clients[i] -> queue[j] -> head ->data_len = 0;
       //TODO check these two
       // clients[i] -> queue[j] -> head = malloc(sizeof(queue_node));
       // clients[i] -> queue[j] -> tail = malloc(sizeof(queue_node));
     }
 
-
   }
 
+  // printf("%s\n", clients[0]->queue[1] ->name);
+  // printf("%s\n", clients[1]->queue[0] ->name);
 
 }
 
